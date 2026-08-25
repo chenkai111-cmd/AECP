@@ -7,3 +7,6 @@ spring:
     active: ${SPRING_PROFILES_ACTIVE:dev}
   application:
     name: ${AECP_APPLICATION_NAME:AECP}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration

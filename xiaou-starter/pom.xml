@@ -29,6 +29,19 @@
         </dependency>
         <dependency>
             <groupId>com.xiaou</groupId>
+            <artifactId>xiaou-aecp-identity</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.xiaou</groupId>
             <artifactId>xiaou-common-mybatis</artifactId>
             <version>${revision}</version>
         </dependency>
