@@ -45,7 +45,7 @@
 
 
         <!-- 打包默认跳过测试 -->
-        <skipTests>true</skipTests>
+        <skipTests>false</skipTests>
 
     </properties>
 

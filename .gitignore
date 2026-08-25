@@ -34,5 +34,14 @@ build/
 ### VS Code ###
 .vscode/
 
+### Local environment ###
+.env
+.env.*
+!.env.example
+
+### Generated local runtime artifacts ###
+**/logs/
+**/pom-xml-flattened
+
 ### Mac OS ###
 .DS_Store

@@ -1,20 +1,20 @@
 spring:
   datasource:
-    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
-    url: jdbc:p6spy:mysql://45.192.101.124:3306/u-space?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
-    username: u-space
-    password: 123456
+    driver-class-name: ${AECP_DB_DRIVER:com.p6spy.engine.spy.P6SpyDriver}
+    url: ${AECP_DB_URL}
+    username: ${AECP_DB_USERNAME}
+    password: ${AECP_DB_PASSWORD}
   redis:
     redisson:
       config: |
         singleServerConfig:
-          address: redis://localhost:6379 # Redis 连接地址，前缀为 redis://
-          timeout: 3000
+          address: ${AECP_REDIS_ADDRESS:redis://localhost:6379}
+          timeout: ${AECP_REDIS_TIMEOUT:3000}
 sa-token:
   alone-redis:
-    database: 11
-    host: 127.0.0.1
-    port: 6379
+    database: ${AECP_REDIS_DATABASE:11}
+    host: ${AECP_REDIS_HOST:127.0.0.1}
+    port: ${AECP_REDIS_PORT:6379}
 
 #文件上传
 #dromara:

@@ -42,6 +42,13 @@
             <artifactId>xiaou-test</artifactId>
             <version>${revision}</version>
         </dependency>
+
+        <!-- JUnit 5、Spring Boot Test 和 MockMvc 测试框架 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 
