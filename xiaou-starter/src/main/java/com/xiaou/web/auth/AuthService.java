@@ -1,11 +1,13 @@
 package com.xiaou.web.auth;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Base64;
 
+@Service
 public class AuthService {
 
     private static final int TOKEN_BYTES = 32;
