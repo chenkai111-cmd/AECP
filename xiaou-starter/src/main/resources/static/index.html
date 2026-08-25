@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071525">
+  <meta name="description" content="AECP 飞机与发动机协同研发平台一期欢迎页">
+  <title>AECP · 飞机与发动机协同研发平台</title>
+  <style>
+    :root {
+      --ink: #eef6ff;
+      --muted: #98abc0;
+      --line: rgba(176, 207, 232, .16);
+      --panel: rgba(13, 31, 51, .72);
+      --navy: #071525;
+      --cyan: #6dd9e7;
+      --orange: #ffb875;
+      --green: #86dbb1;
+      --shadow: 0 22px 70px rgba(0, 0, 0, .28);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 78% 10%, rgba(63, 145, 191, .22), transparent 29rem),
+        radial-gradient(circle at 8% 46%, rgba(35, 84, 144, .18), transparent 28rem),
+        var(--navy);
+      font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+      line-height: 1.6;
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      content: "";
+      opacity: .24;
+      background-image:
+        linear-gradient(rgba(173, 214, 238, .08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(173, 214, 238, .08) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: linear-gradient(to bottom, #000, transparent 88%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .skip-link {
+      position: absolute;
+      top: -3rem;
+      left: 1rem;
+      z-index: 10;
+      padding: .65rem 1rem;
+      color: var(--navy);
+      background: var(--cyan);
+      border-radius: .65rem;
+    }
+
+    .skip-link:focus { top: 1rem; }
+
+    .page-shell {
+      width: min(1180px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 82px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand,
+    .brand-copy,
+    .topbar-nav,
+    .status-pill,
+    .btn,
+    .flow-label,
+    .capability-title,
+    .signal-row,
+    .footer-meta {
+      display: flex;
+      align-items: center;
+    }
+
+    .brand { gap: .8rem; }
+
+    .brand-mark {
+      position: relative;
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      color: var(--navy);
+      background: linear-gradient(145deg, var(--cyan), #9ff0d5);
+      border-radius: 12px 12px 12px 4px;
+      box-shadow: 0 0 0 5px rgba(109, 217, 231, .08), 0 8px 24px rgba(109, 217, 231, .18);
+      font-size: .75rem;
+      font-weight: 800;
+      letter-spacing: -.04em;
+    }
+
+    .brand-mark::after {
+      position: absolute;
+      right: -5px;
+      bottom: -5px;
+      width: 12px;
+      height: 12px;
+      content: "";
+      background: var(--orange);
+      border: 3px solid var(--navy);
+      border-radius: 50%;
+    }
+
+    .brand-copy { gap: .7rem; }
+
+    .brand-name {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 750;
+      letter-spacing: .03em;
+    }
+
+    .brand-divider { width: 1px; height: 18px; background: var(--line); }
+
+    .brand-caption {
+      color: var(--muted);
+      font-size: .8rem;
+    }
+
+    .topbar-nav { gap: 1.5rem; }
+
+    .topbar-nav a {
+      color: var(--muted);
+      font-size: .82rem;
+      transition: color .2s ease;
+    }
+
+    .topbar-nav a:hover,
+    .topbar-nav a:focus-visible { color: var(--ink); }
+
+    .status-pill {
+      gap: .45rem;
+      margin-left: .5rem;
+      padding: .36rem .7rem;
+      color: var(--green);
+      background: rgba(134, 219, 177, .08);
+      border: 1px solid rgba(134, 219, 177, .2);
+      border-radius: 999px;
+      font-size: .73rem;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px rgba(134, 219, 177, .1);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.02fr) minmax(380px, .98fr);
+      gap: clamp(2rem, 6vw, 7rem);
+      align-items: center;
+      min-height: 620px;
+      padding: 78px 0 88px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      margin-bottom: 1.5rem;
+      color: var(--cyan);
+      font-size: .73rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 28px;
+      height: 1px;
+      content: "";
+      background: var(--cyan);
+      box-shadow: 8px 0 0 rgba(109, 217, 231, .3);
+    }
+
+    h1 {
+      max-width: 680px;
+      margin: 0;
+      font-size: clamp(2.65rem, 5vw, 5.15rem);
+      font-weight: 730;
+      letter-spacing: -.075em;
+      line-height: 1.06;
+    }
+
+    h1 span {
+      display: block;
+      color: var(--cyan);
+    }
+
+    .hero-copy {
+      max-width: 580px;
+      margin: 1.65rem 0 0;
+      color: var(--muted);
+      font-size: 1.03rem;
+    }
+
+    .hero-copy strong { color: var(--ink); font-weight: 600; }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .8rem;
+      margin-top: 2.2rem;
+    }
+
+    .btn {
+      justify-content: center;
+      gap: .7rem;
+      min-height: 46px;
+      padding: 0 1.1rem;
+      border: 1px solid transparent;
+      border-radius: .7rem;
+      font-size: .85rem;
+      font-weight: 700;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .btn:hover,
+    .btn:focus-visible { transform: translateY(-2px); }
+
+    .btn-primary {
+      color: var(--navy);
+      background: linear-gradient(135deg, #a0f0e0, var(--cyan));
+      box-shadow: 0 12px 28px rgba(109, 217, 231, .15);
+    }
+
+    .btn-secondary {
+      color: var(--ink);
+      background: rgba(255, 255, 255, .03);
+      border-color: var(--line);
+    }
+
+    .btn-secondary:hover,
+    .btn-secondary:focus-visible { background: rgba(255, 255, 255, .07); border-color: rgba(176, 207, 232, .3); }
+
+    .arrow { font-size: 1.15rem; line-height: 0; }
+
+    .hero-note {
+      display: flex;
+      gap: .65rem;
+      align-items: flex-start;
+      max-width: 510px;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      color: #71869c;
+      border-top: 1px solid var(--line);
+      font-size: .75rem;
+    }
+
+    .hero-note-mark { color: var(--orange); }
+
+    .hero-visual {
+      position: relative;
+      min-height: 430px;
+      padding: 1.2rem;
+      background: linear-gradient(145deg, rgba(17, 45, 72, .9), rgba(7, 21, 37, .72));
+      border: 1px solid rgba(168, 211, 238, .19);
+      border-radius: 1.4rem;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .hero-visual::before {
+      position: absolute;
+      top: -100px;
+      right: -80px;
+      z-index: -1;
+      width: 290px;
+      height: 290px;
+      content: "";
+      border: 1px solid rgba(109, 217, 231, .18);
+      border-radius: 50%;
+      box-shadow: 0 0 0 28px rgba(109, 217, 231, .035), 0 0 0 58px rgba(109, 217, 231, .025);
+    }
+
+    .visual-topline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: .4rem .35rem 1rem;
+      color: var(--muted);
+      font-size: .72rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .visual-id { color: #607991; }
+
+    .visual-board {
+      display: grid;
+      gap: 1rem;
+      height: calc(100% - 40px);
+      padding: 1.25rem;
+      background: rgba(3, 13, 25, .42);
+      border: 1px solid rgba(176, 207, 232, .1);
+      border-radius: .95rem;
+    }
+
+    .board-heading { display: flex; justify-content: space-between; align-items: flex-start; }
+
+    .board-heading h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      letter-spacing: -.04em;
+    }
+
+    .board-heading p { margin: .25rem 0 0; color: var(--muted); font-size: .72rem; }
+
+    .board-tag {
+      padding: .28rem .5rem;
+      color: var(--orange);
+      background: rgba(255, 184, 117, .08);
+      border: 1px solid rgba(255, 184, 117, .18);
+      border-radius: .45rem;
+      font-size: .68rem;
+    }
+
+    .flow-map {
+      display: grid;
+      align-content: center;
+      gap: .55rem;
+      padding: .6rem 0;
+    }
+
+    .flow-label {
+      justify-content: space-between;
+      color: #7791a8;
+      font-size: .68rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .flow-label::after {
+      width: 45%;
+      height: 1px;
+      content: "";
+      background: linear-gradient(90deg, rgba(109, 217, 231, .55), transparent);
+    }
+
+    .flow-track {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .45rem;
+      align-items: center;
+    }
+
+    .flow-node {
+      position: relative;
+      display: grid;
+      min-height: 82px;
+      place-items: center;
+      padding: .7rem .4rem;
+      background: rgba(16, 43, 71, .76);
+      border: 1px solid rgba(176, 207, 232, .14);
+      border-radius: .65rem;
+      text-align: center;
+    }
+
+    .flow-node:not(:last-child)::after {
+      position: absolute;
+      top: 50%;
+      right: -.7rem;
+      width: .95rem;
+      height: 1px;
+      content: "";
+      background: var(--cyan);
+      opacity: .75;
+    }
+
+    .flow-number { color: var(--cyan); font-size: .64rem; font-weight: 700; }
+    .flow-name { margin-top: .25rem; font-size: .78rem; font-weight: 650; }
+    .flow-hint { color: #718aa1; font-size: .62rem; }
+
+    .board-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-top: .75rem;
+      color: #70869d;
+      border-top: 1px solid var(--line);
+      font-size: .68rem;
+    }
+
+    .board-footer strong { color: var(--green); font-weight: 600; }
+
+    .section { padding: 10px 0 104px; }
+
+    .section-heading {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 2rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .section-kicker { color: var(--orange); font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+
+    h2.section-title {
+      margin: .45rem 0 0;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      letter-spacing: -.06em;
+      line-height: 1.1;
+    }
+
+    .section-intro { max-width: 360px; margin: 0; color: var(--muted); font-size: .85rem; }
+
+    .capability-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .85rem;
+    }
+
+    .capability-card {
+      min-height: 160px;
+      padding: 1.15rem;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: .9rem;
+      transition: background .2s ease, border-color .2s ease, transform .2s ease;
+    }
+
+    .capability-card:hover { background: rgba(20, 50, 79, .8); border-color: rgba(109, 217, 231, .3); transform: translateY(-3px); }
+
+    .capability-title { justify-content: space-between; gap: 1rem; }
+
+    .capability-index { color: var(--cyan); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .7rem; }
+
+    .capability-title h3 { margin: 0; font-size: 1rem; font-weight: 650; }
+
+    .capability-card p { margin: .85rem 0 0; color: var(--muted); font-size: .78rem; }
+
+    .capability-meta { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: 1rem; }
+
+    .meta-chip { padding: .25rem .45rem; color: #7f9ab2; background: rgba(255, 255, 255, .035); border-radius: .35rem; font-size: .62rem; }
+
+    .signal-strip {
+      display: grid;
+      grid-template-columns: .8fr 1.2fr;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding: 1.15rem;
+      background: linear-gradient(90deg, rgba(11, 35, 59, .9), rgba(14, 38, 62, .45));
+      border: 1px solid var(--line);
+      border-radius: .9rem;
+    }
+
+    .signal-lead { padding: .2rem .5rem .2rem .1rem; }
+    .signal-lead p { margin: .25rem 0 0; color: var(--muted); font-size: .76rem; }
+
+    .signal-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
+
+    .signal-row { gap: .55rem; padding: .55rem .65rem; background: rgba(255, 255, 255, .035); border-radius: .55rem; color: #afc3d6; font-size: .73rem; }
+
+    .signal-icon { color: var(--cyan); font-size: .9rem; }
+
+    footer { padding: 1.2rem 0 2rem; color: #698197; border-top: 1px solid var(--line); font-size: .7rem; }
+
+    .footer-meta { justify-content: space-between; gap: 1rem; }
+
+    .footer-brand { color: #a5bad0; font-weight: 650; }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding-top: 64px; }
+      .hero-visual { min-height: 390px; }
+      .capability-grid { grid-template-columns: repeat(2, 1fr); }
+      .signal-strip { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .page-shell { width: min(100% - 32px, 520px); }
+      .topbar { min-height: 72px; }
+      .brand-caption, .brand-divider, .topbar-nav a { display: none; }
+      .topbar-nav { gap: .6rem; }
+      .status-pill { margin-left: 0; }
+      .hero { min-height: auto; padding: 58px 0 70px; }
+      h1 { font-size: clamp(2.55rem, 13vw, 4rem); }
+      .hero-copy { font-size: .92rem; }
+      .hero-visual { min-height: 355px; padding: .8rem; }
+      .visual-board { padding: .85rem; }
+      .board-heading h2 { font-size: 1.08rem; }
+      .flow-node { min-height: 74px; }
+      .flow-name { font-size: .68rem; }
+      .flow-hint { display: none; }
+      .section { padding-bottom: 70px; }
+      .section-heading { display: block; }
+      .section-intro { margin-top: .85rem; }
+      .capability-grid { grid-template-columns: 1fr; }
+      .signal-list { grid-template-columns: 1fr; }
+      .footer-meta { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到主要内容</a>
+  <div class="page-shell">
+    <header class="topbar" aria-label="平台导航">
+      <a class="brand" href="#top" aria-label="返回 AECP 首页">
+        <span class="brand-mark" aria-hidden="true">A·E</span>
+        <span class="brand-copy">
+          <span class="brand-name">AECP</span>
+          <span class="brand-divider" aria-hidden="true"></span>
+          <span class="brand-caption">飞机与发动机协同研发平台</span>
+        </span>
+      </a>
+      <nav class="topbar-nav" aria-label="页面导航">
+        <a href="#flow">协作主链路</a>
+        <a href="#capabilities">一期能力</a>
+        <span class="status-pill"><span class="status-dot" aria-hidden="true"></span>一期 MVP</span>
+      </nav>
+    </header>
+
+    <main id="main-content">
+      <section class="hero" id="top" aria-labelledby="hero-title">
+        <div>
+          <div class="eyebrow">AERO · ENGINE · COLLABORATION</div>
+          <h1 id="hero-title">让每一次协同，<span>都能形成闭环。</span></h1>
+          <p class="hero-copy">
+            面向飞机与发动机联合研发的统一协作空间。围绕
+            <strong>会议决议、任务分发、文件版本和系统部件</strong>，把跨组织的技术协作沉淀为可追溯的研发过程。
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#flow">查看协作主链路 <span class="arrow" aria-hidden="true">→</span></a>
+            <a class="btn btn-secondary" href="#capabilities">了解一期能力</a>
+          </div>
+          <p class="hero-note"><span class="hero-note-mark" aria-hidden="true">✦</span><span>一期聚焦“会议 → 任务 → 文件 → 部件追溯”垂直闭环，STEP 数模支持浏览器端查看。</span></p>
+        </div>
+
+        <div class="hero-visual" aria-label="一期协作主链路预览">
+          <div class="visual-topline"><span>协同控制台 / 预览</span><span class="visual-id">AECP–MVP–01</span></div>
+          <div class="visual-board">
+            <div class="board-heading">
+              <div><h2>一期协作主链路</h2><p>从会议决议到部件状态，信息在一个空间内连续流动。</p></div>
+              <span class="board-tag">P0 CORE</span>
+            </div>
+            <div class="flow-map" aria-hidden="true">
+              <div class="flow-label"><span>TRACEABLE DELIVERY</span><span>01—04</span></div>
+              <div class="flow-track">
+                <div class="flow-node"><span class="flow-number">01</span><span class="flow-name">会议</span><span class="flow-hint">决议沉淀</span></div>
+                <div class="flow-node"><span class="flow-number">02</span><span class="flow-name">任务</span><span class="flow-hint">自动分发</span></div>
+                <div class="flow-node"><span class="flow-number">03</span><span class="flow-name">文件</span><span class="flow-hint">版本关联</span></div>
+                <div class="flow-node"><span class="flow-number">04</span><span class="flow-name">部件</span><span class="flow-hint">状态追溯</span></div>
+              </div>
+            </div>
+            <div class="board-footer"><span>双方项目成员共享同一文件空间</span><strong>READY TO COLLABORATE</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="flow" aria-labelledby="flow-title">
+        <div class="section-heading">
+          <div><div class="section-kicker">01 / Core workflow</div><h2 class="section-title" id="flow-title">一条链路，连接每个关键动作。</h2></div>
+          <p class="section-intro">把“会上说了什么、谁来完成、文件用哪个版本、影响哪个部件”放到同一条可回看的线上记录里。</p>
+        </div>
+        <div class="capability-grid">
+          <article class="capability-card">
+            <div class="capability-title"><h3>会议决议有出处</h3><span class="capability-index">01</span></div>
+            <p>预约、议程、纪要与结构化决议集中沉淀，历史会议可以按时间和参与人追溯。</p>
+            <div class="capability-meta"><span class="meta-chip">会议管理</span><span class="meta-chip">决议留痕</span></div>
+          </article>
+          <article class="capability-card">
+            <div class="capability-title"><h3>任务分发有负责人</h3><span class="capability-index">02</span></div>
+            <p>决议确认后形成任务，按部件负责人和职责矩阵进入对应成员的代办列表。</p>
+            <div class="capability-meta"><span class="meta-chip">自动分发</span><span class="meta-chip">代办 / 已办</span></div>
+          </article>
+          <article class="capability-card">
+            <div class="capability-title"><h3>文件版本可复用</h3><span class="capability-index">03</span></div>
+            <p>统一项目文件空间支持双方成员查看与上传，文件版本和部件关联保持一致。</p>
+            <div class="capability-meta"><span class="meta-chip">统一空间</span><span class="meta-chip">版本管理</span></div>
+          </article>
+          <article class="capability-card">
+            <div class="capability-title"><h3>部件状态能追溯</h3><span class="capability-index">04</span></div>
+            <p>部件树、双方负责人、关联文件与数模、变更记录在一个视图中连续呈现。</p>
+            <div class="capability-meta"><span class="meta-chip">部件中心</span><span class="meta-chip">责任矩阵</span></div>
+          </article>
+          <article class="capability-card">
+            <div class="capability-title"><h3>STEP 数模可在线查看</h3><span class="capability-index">05</span></div>
+            <p>一期支持 STEP 文件在浏览器端解析查看，为文件、数模和部件之间建立直观连接。</p>
+            <div class="capability-meta"><span class="meta-chip">.step / .stp</span><span class="meta-chip">浏览器预览</span></div>
+          </article>
+          <article class="capability-card">
+            <div class="capability-title"><h3>项目进展有全局视角</h3><span class="capability-index">06</span></div>
+            <p>项目经理可以从任务完成、部件交付和风险事项等维度掌握协作健康度。</p>
+            <div class="capability-meta"><span class="meta-chip">项目看板</span><span class="meta-chip">过程透明</span></div>
+          </article>
+        </div>
+        <div class="signal-strip">
+          <div class="signal-lead"><div class="section-kicker">Shared context</div><p>让商飞侧与商发侧在同一份上下文中协作，减少信息断点。</p></div>
+          <div class="signal-list">
+            <div class="signal-row"><span class="signal-icon" aria-hidden="true">⌁</span><span>双方成员共享项目文件空间</span></div>
+            <div class="signal-row"><span class="signal-icon" aria-hidden="true">◌</span><span>任务来源和责任关系可回看</span></div>
+            <div class="signal-row"><span class="signal-icon" aria-hidden="true">⌖</span><span>数据围绕系统部件组织</span></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-meta"><span class="footer-brand">AECP / Aero-Engine Collaboration Platform</span><span>一期工程初始化 · 欢迎进入协同研发空间</span></div>
+    </footer>
+  </div>
+</body>
+</html>

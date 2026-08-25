@@ -42,6 +42,8 @@ build/
 ### Generated local runtime artifacts ###
 **/logs/
 **/pom-xml-flattened
+/xiaou-frontend/dist/
+/xiaou-frontend/node_modules/
 
 ### Mac OS ###
 .DS_Store

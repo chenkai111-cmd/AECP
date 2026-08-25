@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.http.MediaType.TEXT_HTML;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -19,9 +20,11 @@ class IndexControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    void rootReturnsWelcomeMessage() throws Exception {
+    void rootReturnsAecpWelcomePage() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("欢迎使用AECP，请通过前端地址访问。"));
+                .andExpect(content().contentTypeCompatibleWith(TEXT_HTML))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("飞机与发动机协同研发")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("会议 → 任务 → 文件 → 部件追溯")));
     }
 }

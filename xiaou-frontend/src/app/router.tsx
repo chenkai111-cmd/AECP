@@ -1,68 +1,16 @@
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 
+import { RouteStateShowcase } from './components/RouteStateShowcase'
+import {
+  getProtectedRouteForPath,
+  protectedRouteEntries,
+  sanitizeProtectedRedirect
+} from './route-config'
 import { DashboardPage } from '../pages/DashboardPage'
 import { LoginPage } from '../pages/LoginPage'
 import { WorkspacePage } from '../pages/WorkspacePage'
 
 export const DEMO_SESSION_STORAGE_KEY = 'aecp-demo-session'
-
-type BusinessRoute = {
-  path: string
-  navLabel: string
-  title: string
-  description: string
-}
-
-const businessRoutes: BusinessRoute[] = [
-  {
-    path: '/workspace',
-    navLabel: '项目空间',
-    title: '项目空间壳体',
-    description: '真实项目列表、最近访问和切换逻辑将在后续任务中实现；本任务仅交付工程壳与路由骨架。'
-  },
-  {
-    path: '/dashboard',
-    navLabel: '项目总览',
-    title: '项目总览驾驶舱',
-    description: '当前页面只提供壳体、布局与状态组件占位；真实数据与交互行为由后续任务接管。'
-  },
-  {
-    path: '/meetings',
-    navLabel: '会议协同',
-    title: '会议协同占位页',
-    description: '会议预约、议程、纪要和决议数据将在后续任务中实现；本任务仅交付工程壳与路由骨架。'
-  },
-  {
-    path: '/tasks',
-    navLabel: '任务闭环',
-    title: '任务闭环占位页',
-    description: '任务列表、状态流转和催办行为将在后续任务中实现；本任务仅交付工程壳与路由骨架。'
-  },
-  {
-    path: '/files',
-    navLabel: '文件空间',
-    title: '文件空间占位页',
-    description: '文件上传、版本、筛选和权限数据将在后续任务中实现；本任务仅交付工程壳与路由骨架。'
-  },
-  {
-    path: '/components',
-    navLabel: '部件追溯',
-    title: '部件追溯占位页',
-    description: '部件树、责任矩阵和关联时间线将在后续任务中实现；本任务仅交付工程壳与路由骨架。'
-  },
-  {
-    path: '/models/:fileVersionId',
-    navLabel: '数模查看',
-    title: '数模查看占位页',
-    description: 'STEP 解析、查看器和批注能力将在后续任务中实现；本任务仅交付工程壳与路由骨架。'
-  },
-  {
-    path: '/admin/audit',
-    navLabel: '系统审计',
-    title: '系统审计占位页',
-    description: '审计日志、筛选器和明细行为将在后续任务中实现；本任务仅交付工程壳与路由骨架。'
-  }
-]
 
 function hasDemoSession() {
   return window.localStorage.getItem(DEMO_SESSION_STORAGE_KEY) === 'active'
@@ -182,10 +130,8 @@ function RequireDemoSession() {
 function AppShell() {
   const navigate = useNavigate()
   const location = useLocation()
-  const activeLabel =
-    businessRoutes.find((route) =>
-      route.path.includes(':fileVersionId') ? location.pathname.startsWith('/models/') : route.path === location.pathname
-    )?.navLabel ?? '工作台'
+  const activeRoute = getProtectedRouteForPath(location.pathname)
+  const activeLabel = activeRoute?.navLabel ?? '工作台'
 
   return (
     <div className="app-shell">
@@ -196,17 +142,15 @@ function AppShell() {
           <p className="shell-summary">公开首页与登录页保持开放，业务路由统一通过一个本地 demo-session guard 受控。</p>
         </div>
         <nav aria-label="AECP 主导航" className="shell-nav">
-          {businessRoutes.map((route) => {
-            const isCurrent = route.path.includes(':fileVersionId')
-              ? location.pathname.startsWith('/models/')
-              : location.pathname === route.path
+          {protectedRouteEntries.map((route) => {
+            const isCurrent = getProtectedRouteForPath(location.pathname)?.navLabel === route.navLabel
 
             return (
               <Link
                 key={route.path}
                 aria-current={isCurrent ? 'page' : undefined}
                 className={isCurrent ? 'nav-link current' : 'nav-link'}
-                to={route.path.includes(':fileVersionId') ? '/models/FV-2026-001' : route.path}
+                to={route.path}
               >
                 {route.navLabel}
               </Link>
@@ -248,35 +192,8 @@ function PlaceholderPage({ description, title }: { description: string; title: s
         <p>{description}</p>
       </section>
 
-      <section className="state-grid" aria-label="通用界面状态示例">
-        <StatusCard title="加载中" tone="loading">
-          用于后续接口请求、模型加载和延迟初始化过程。
-        </StatusCard>
-        <StatusCard title="暂无数据" tone="empty">
-          当后续任务尚未返回业务实体时，统一展示空态说明和下一步提示。
-        </StatusCard>
-        <StatusCard title="示例错误态" tone="error">
-          当前只展示可复用样式，真实错误码、重试策略和审计行为由后续任务负责。
-        </StatusCard>
-      </section>
+      <RouteStateShowcase ariaLabel="通用界面状态示例" />
     </main>
-  )
-}
-
-function StatusCard({
-  children,
-  title,
-  tone
-}: {
-  children: string
-  title: string
-  tone: 'loading' | 'empty' | 'error'
-}) {
-  return (
-    <article className={`status-card status-${tone}`}>
-      <h2>{title}</h2>
-      <p>{children}</p>
-    </article>
   )
 }
 
@@ -284,7 +201,7 @@ function LoginRoutePage() {
   const navigate = useNavigate()
   const location = useLocation()
   const search = new URLSearchParams(location.search)
-  const redirectTo = search.get('redirect') || '/workspace'
+  const redirectTo = sanitizeProtectedRedirect(search.get('redirect'))
 
   return (
     <LoginPage
@@ -305,13 +222,13 @@ export function AppRoutes() {
       <Route element={<RequireDemoSession />}>
         <Route element={<WorkspacePage />} path="/workspace" />
         <Route element={<DashboardPage />} path="/dashboard" />
-        {businessRoutes
+        {protectedRouteEntries
           .filter((route) => route.path !== '/workspace' && route.path !== '/dashboard')
           .map((route) => (
             <Route
               element={<PlaceholderPage description={route.description} title={route.title} />}
               key={route.path}
-              path={route.path}
+              path={route.path === '/models/FV-2026-001' ? '/models/:fileVersionId' : route.path}
             />
           ))}
       </Route>

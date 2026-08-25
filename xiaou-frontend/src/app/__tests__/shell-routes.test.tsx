@@ -1,8 +1,36 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, useLocation } from 'react-router-dom'
 
-import { AppRoutes, DEMO_SESSION_STORAGE_KEY } from '../router'
+import {
+  AppRoutes,
+  DEMO_SESSION_STORAGE_KEY
+} from '../router'
+import {
+  PROTECTED_ROUTE_FALLBACK,
+  protectedRouteEntries,
+  sanitizeProtectedRedirect
+} from '../route-config'
+
+function LocationProbe() {
+  const location = useLocation()
+  return (
+    <output data-testid="location-display">
+      {location.pathname}
+      {location.search}
+      {location.hash}
+    </output>
+  )
+}
+
+function renderApp(initialEntries: string[]) {
+  return render(
+    <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }} initialEntries={initialEntries}>
+      <AppRoutes />
+      <LocationProbe />
+    </MemoryRouter>
+  )
+}
 
 describe('AECP frontend shell routes', () => {
   beforeEach(() => {
@@ -10,11 +38,7 @@ describe('AECP frontend shell routes', () => {
   })
 
   it('renders the public product home with the migrated product-positioning copy', () => {
-    render(
-      <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }} initialEntries={['/']}>
-        <AppRoutes />
-      </MemoryRouter>
-    )
+    renderApp(['/'])
 
     expect(
       screen.getByRole('heading', { name: '让每一次协同，都能形成闭环。' })
@@ -24,60 +48,71 @@ describe('AECP frontend shell routes', () => {
     ).toBeInTheDocument()
   })
 
-  it('redirects unauthenticated users from protected routes to login and preserves the target path', async () => {
-    render(
-      <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }} initialEntries={['/models/FV-2026-001']}>
-        <AppRoutes />
-      </MemoryRouter>
-    )
-
-    expect(
-      await screen.findByRole('heading', { name: '登录 AECP 前端演示壳' })
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText('当前只启用本地 demo-session 适配器，用于 Task 05 前的路由联调。')
-    ).toBeInTheDocument()
-    expect(screen.getByText('登录后将跳转到：/models/FV-2026-001')).toBeInTheDocument()
+  it.each([
+    ['malicious protocol', 'javascript:alert(1)', PROTECTED_ROUTE_FALLBACK],
+    ['external url', 'https://evil.example/attack', PROTECTED_ROUTE_FALLBACK],
+    ['protocol relative', '//evil.example/attack', PROTECTED_ROUTE_FALLBACK],
+    ['public home', '/', PROTECTED_ROUTE_FALLBACK],
+    ['public login', '/login', PROTECTED_ROUTE_FALLBACK],
+    ['unknown internal', '/unknown/route', PROTECTED_ROUTE_FALLBACK],
+    ['valid nested model', '/models/FV-2026-001?tab=preview#mesh', '/models/FV-2026-001?tab=preview#mesh']
+  ])('sanitizes %s redirect targets', (_label, redirect, expected) => {
+    expect(sanitizeProtectedRedirect(redirect)).toBe(expected)
   })
 
-  it('creates a local demo session and lands on the originally requested protected route', async () => {
+  it.each([
+    ['external url', 'https://evil.example/attack'],
+    ['public home', '/'],
+    ['unknown internal', '/unknown/route']
+  ])('falls back to workspace when login redirect is %s', async (_label, redirect) => {
     const user = userEvent.setup()
 
-    render(
-      <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }} initialEntries={['/dashboard']}>
-        <AppRoutes />
-      </MemoryRouter>
-    )
+    renderApp([`/login?redirect=${encodeURIComponent(redirect)}`])
 
     await user.click(screen.getByRole('button', { name: '进入本地演示会话' }))
 
-    expect(window.localStorage.getItem(DEMO_SESSION_STORAGE_KEY)).toBe('active')
-    expect(
-      await screen.findByRole('heading', { name: '项目总览驾驶舱' })
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText('当前页面只提供壳体、布局与状态组件占位；真实数据与交互行为由后续任务接管。')
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('location-display')).toHaveTextContent(PROTECTED_ROUTE_FALLBACK)
+    expect(await screen.findByRole('heading', { name: '项目空间壳体' })).toBeInTheDocument()
   })
 
-  it('renders the protected shell navigation and placeholder ownership notice for business pages', async () => {
-    window.localStorage.setItem(DEMO_SESSION_STORAGE_KEY, 'active')
+  it('keeps a valid nested model redirect after login', async () => {
+    const user = userEvent.setup()
 
-    render(
-      <MemoryRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }} initialEntries={['/admin/audit']}>
-        <AppRoutes />
-      </MemoryRouter>
-    )
+    renderApp([
+      `/login?redirect=${encodeURIComponent('/models/FV-2026-001?tab=preview#mesh')}`
+    ])
 
-    expect(
-      await screen.findByRole('navigation', { name: 'AECP 主导航' })
-    ).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: '系统审计' })).toHaveAttribute('aria-current', 'page')
-    expect(
-      screen.getByText('审计日志、筛选器和明细行为将在后续任务中实现；本任务仅交付工程壳与路由骨架。')
-    ).toBeInTheDocument()
-    expect(screen.getByText('加载中')).toBeInTheDocument()
-    expect(screen.getByText('暂无数据')).toBeInTheDocument()
-    expect(screen.getByText('示例错误态')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '进入本地演示会话' }))
+
+    expect(screen.getByTestId('location-display')).toHaveTextContent('/models/FV-2026-001?tab=preview#mesh')
+    expect(await screen.findByRole('heading', { name: '数模查看占位页' })).toBeInTheDocument()
   })
+
+  it.each(protectedRouteEntries)(
+    'protects %s while logged out',
+    async ({ path }) => {
+      renderApp([path])
+
+      expect(
+        await screen.findByRole('heading', { name: '登录 AECP 前端演示壳' })
+      ).toBeInTheDocument()
+      expect(screen.getByTestId('location-display')).toHaveTextContent(
+        `/login?redirect=${encodeURIComponent(path)}`
+      )
+    }
+  )
+
+  it.each(protectedRouteEntries)(
+    'renders shell and target page for %s while demo-authenticated',
+    async ({ navLabel, path, title }) => {
+      window.localStorage.setItem(DEMO_SESSION_STORAGE_KEY, 'active')
+
+      renderApp([path])
+
+      expect(await screen.findByRole('navigation', { name: 'AECP 主导航' })).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: navLabel })).toHaveAttribute('aria-current', 'page')
+      expect(screen.getByRole('heading', { name: title })).toBeInTheDocument()
+      expect(screen.getByTestId('location-display')).toHaveTextContent(path)
+    }
+  )
 })

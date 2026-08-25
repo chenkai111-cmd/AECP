@@ -1,3 +1,5 @@
+import { RouteStateShowcase } from '../app/components/RouteStateShowcase'
+
 export function WorkspacePage() {
   return (
     <main className="workspace-page">
@@ -17,6 +19,8 @@ export function WorkspacePage() {
           <p>加载、空态和错误态会在后续任务直接复用，不再重复搭基础视觉结构。</p>
         </article>
       </section>
+
+      <RouteStateShowcase ariaLabel="项目空间通用状态示例" />
     </main>
   )
 }
