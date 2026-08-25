@@ -4,9 +4,9 @@
 
 ## 当前状态
 
-- 阶段：工程初始化基线已完成，F02 认证会话功能已实现并完成分层验收。
-- 当前进行中：暂无功能处于开发中，下一切片为 F03 组织成员管理。
-- 业务范围：F00 首页、F01 前端演示会话和 F02 后端认证已完成；F03 及后续业务功能尚未开发。
+- 阶段：工程初始化基线和 F00-F03 已完成；F03 组织成员管理已完成分层与真实环境验收。
+- 当前进行中：暂无功能处于开发中，下一切片为 F04。
+- 业务范围：F00 首页、F01 前端演示会话、F02 后端认证和 F03 组织成员管理已完成；F04 及后续功能尚未开发。
 
 ## 已完成
 
@@ -17,10 +17,11 @@
 - F00 首页契约已实现：`GET /` 返回 HTML 200，包含 `欢迎使用AECP` 与 `会议 → 任务 → 文件 → 部件追溯`，并由 MockMvc 与真实 HTTP 冒烟覆盖。
 - F01 前端演示会话已保留并通过路由回归：登录后可访问受保护演示路由，退出后重定向到 `/login`。
 - F02 后端认证会话已实现：BCrypt 校验配置的演示账号，Redis 保存带 TTL 的 opaque token，登录/退出接口完成 MockMvc、完整 Maven 和真实 Redis E2E 验证。
+- F03 组织成员管理已实现：独立 Identity 模块以 Flyway V1 建表和固定种子，Spring JDBC 持久化成员关系，组织管理员可查询、添加、改角色和软删除成员；组织级行锁保护最后管理员约束，Bearer 会话和 HTTP 错误映射完成真实 MySQL/Redis E2E 验证。
 
 ## 未完成
 
-- F03 及后续组织、项目、会议、任务、文件和部件追溯业务尚未开发。
+- F04 及后续项目、会议、任务、文件和部件追溯业务尚未开发。
 
 ## 进行中
 
@@ -29,11 +30,11 @@
 ## 已知问题
 
 - 当前 PowerShell 环境无法识别 `make` 命令，因此仓库约定的 `make check` 尚未执行成功。
-- 后续功能的验收标准、接口和数据模型需要在对应切片启动前明确。
+- F04 及后续功能的验收标准、接口和数据模型需要在对应切片启动前明确。
 
 ## 下一步
 
-1. 激活并实现下一个功能项 F03，先明确成员管理的验收标准。
+1. 激活并实现下一个功能项 F04，先明确其验收标准。
 2. 按“数据库 → 后端 → 权限 → 前端 → 测试 → 端到端验证”的顺序实现一个可验收切片。
 3. 保持每个切片的真实命令、结果和未解决问题记录在本文件中。
 4. 评估并补齐 `make check` 的 Windows 可执行入口，或在项目规范中明确等价检查命令。
@@ -58,3 +59,11 @@
 | 2026-08-25 | `pnpm test:routes`、`pnpm typecheck`、`pnpm build` | 通过 | 使用工作区 Bundled Node/pnpm 重跑；前端路由 29/29 测试通过，类型检查和生产构建通过 |
 | 2026-08-25 | `rg f02-local-pass-2026 logs` | 通过 | 测试密码未写入应用日志 |
 | 2026-08-25 | `make check` | 未执行成功 | 当前 PowerShell 无 `make` 命令 |
+| 2026-08-26 | Identity 聚焦测试 | 通过 | `IdentityMigrationTest`、`OrganizationMemberServiceTest`、`JdbcOrganizationMemberRepositoryTest` 合计 27/27 |
+| 2026-08-26 | F03 Web 与 F02 回归测试 | 通过 | Bearer、成员 Controller、F02 Controller/Service/Redis 合计 28/28 |
+| 2026-08-26 | `.\mvnw.cmd clean test` | 通过 | 全 Reactor 成功；Identity 27/27，starter 32/32 |
+| 2026-08-26 | `.\mvnw.cmd -pl xiaou-starter -am package -DskipTests` | 通过 | starter 可执行 JAR 重打包成功 |
+| 2026-08-26 | 前端 `test:routes`、`typecheck`、`build` | 通过 | 使用工作区 Bundled Node/pnpm；路由 29/29，TypeScript 与 Vite 构建通过 |
+| 2026-08-26 | 首次真实 MySQL 启动 | 先失败后修复 | Flyway 报 `Public Key Retrieval is not allowed`；开发 JDBC URL 增加 `allowPublicKeyRetrieval=true` 后重新打包并通过 |
+| 2026-08-26 | F02 登录 + F03 CRUD + 权限 E2E | 通过 | Flyway 首次应用 V1、二次启动确认最新；add 201、list/patch/delete 200、无效 token 401、跨组织与非管理员 403、logout 200；Compose 已停止且卷保留 |
+| 2026-08-26 | 源码秘密与差异检查 | 通过 | `docs/features.md` 无改动；未发现硬编码真实 token、密码、连接串、Redis key 或内部异常明细 |
