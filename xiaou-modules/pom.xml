@@ -11,6 +11,9 @@
     <packaging>pom</packaging>
     <artifactId>xiaou-modules</artifactId>
 
+    <modules>
+        <module>xiaou-aecp-identity</module>
+    </modules>
 
 
 </project>
