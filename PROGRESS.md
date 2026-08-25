@@ -14,6 +14,7 @@
 - 已保留现有模板模块职责、Maven 坐标、`com.xiaou` 包名和 `xiaou-*` 模块命名。
 - 已建立工程运行与验收文档，启动顺序和故障排查以 `docs/STARTUP_CHECKLIST.md` 为准。
 - 已完成启动清单记录的初始化验收：Java 17、Maven Wrapper、Docker Compose 配置、MySQL/Redis 健康状态、Maven 测试、多模块打包，以及 Spring Boot 根路径 HTTP 200。
+- F00 首页契约已实现：`GET /` 返回 HTML 200，包含 `欢迎使用AECP` 与 `会议 → 任务 → 文件 → 部件追溯`，并由 MockMvc 与真实 HTTP 冒烟覆盖。
 
 ## 未完成
 
@@ -31,7 +32,7 @@
 
 ## 下一步
 
-1. 确定并激活第一个业务功能项，补充其验收标准。
+1. 激活并实现下一个功能项 F01，先明确其验收标准。
 2. 按“数据库 → 后端 → 权限 → 前端 → 测试 → 端到端验证”的顺序实现一个可验收切片。
 3. 保持每个切片的真实命令、结果和未解决问题记录在本文件中。
 4. 评估并补齐 `make check` 的 Windows 可执行入口，或在项目规范中明确等价检查命令。
@@ -45,4 +46,8 @@
 | 2026-08-25 | `./mvnw clean test` | 通过 | 全 Reactor 模块测试通过 |
 | 2026-08-25 | `./mvnw -pl xiaou-starter -am package -DskipTests` | 通过 | 多模块打包通过 |
 | 2026-08-25 | `GET http://localhost:8080/` | 通过 | HTTP 200；验证后已停止应用 |
+| 2026-08-25 | `.\mvnw.cmd -pl xiaou-starter -am -Dtest=IndexControllerTest -Dsurefire.failIfNoSpecifiedTests=false test` | 通过 | F00 定向测试 1/1；先验证缺失欢迎文案导致 RED，再补齐首页文案后通过 |
+| 2026-08-25 | `.\mvnw.cmd clean test` | 通过 | 全 Reactor 10 模块，xiaou-starter 2/2 测试通过 |
+| 2026-08-25 | `.\mvnw.cmd -pl xiaou-starter -am package -DskipTests` | 通过 | xiaou-starter 多模块打包成功 |
+| 2026-08-25 | `GET http://localhost:8080/` F00 首页文案冒烟 | 通过 | HTTP 200、text/html;charset=UTF-8，欢迎文案和主链路文案均存在；验证后停止应用 |
 | 2026-08-25 | `make check` | 未执行成功 | 当前 PowerShell 无 `make` 命令 |

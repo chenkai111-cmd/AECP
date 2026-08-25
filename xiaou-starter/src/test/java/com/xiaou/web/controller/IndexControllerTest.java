@@ -24,6 +24,7 @@ class IndexControllerTest {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(TEXT_HTML))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("欢迎使用AECP")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("飞机与发动机协同研发")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("会议 → 任务 → 文件 → 部件追溯")));
     }
