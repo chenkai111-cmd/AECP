@@ -16,6 +16,13 @@ sa-token:
     host: ${AECP_REDIS_HOST:127.0.0.1}
     port: ${AECP_REDIS_PORT:6379}
 
+aecp:
+  auth:
+    demo-username: ${AECP_AUTH_DEMO_USERNAME:demo-pilot-pm}
+    demo-password: ${AECP_AUTH_DEMO_PASSWORD}
+    session-ttl-seconds: ${AECP_AUTH_SESSION_TTL_SECONDS:3600}
+    session-key-prefix: ${AECP_AUTH_SESSION_KEY_PREFIX:aecp:auth:session:}
+
 #文件上传
 #dromara:
 #  x-file-storage:
