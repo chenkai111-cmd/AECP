@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/ruoyi-common/ruoyi-common-excel/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/ruoyi-common/ruoyi-common-oss/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/ruoyi-common/ruoyi-common-sensitive/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/ruoyi-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/ruoyi-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/ruoyi-extend/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/ruoyi-extend/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/ruoyi-modules/ruoyi-job/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/ruoyi-modules/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/ruoyi-modules/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/u-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/u-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/u-modules/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../../U-Eeasyproject/U-Easyproject/u-modules/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xiaou-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xiaou-common/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xiaou-common/xiaou-common-bom/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xiaou-common/xiaou-common-bom/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xiaou-common/xiaou-common-core/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xiaou-common/xiaou-common-redis/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xiaou-common/xiaou-common-web/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xiaou-common/xiaou-common-web/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xiaou-modules/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xiaou-modules/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xiaou-test/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/xiaou-test/src/main/resources" charset="UTF-8" />
+  </component>
+</project>
