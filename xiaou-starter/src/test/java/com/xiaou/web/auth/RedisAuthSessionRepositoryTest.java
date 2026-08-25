@@ -43,6 +43,23 @@ class RedisAuthSessionRepositoryTest {
     }
 
     @Test
+    void findUsernameReturnsStoredSessionValue() {
+        when(redissonClient.<String>getBucket("test:auth:session:opaque-token")).thenReturn(bucket);
+        when(bucket.get()).thenReturn("demo-admin-a");
+
+        assertThat(repository.findUsername("opaque-token"))
+                .contains("demo-admin-a");
+    }
+
+    @Test
+    void findUsernameReturnsEmptyForMissingSession() {
+        when(redissonClient.<String>getBucket("test:auth:session:missing-token")).thenReturn(bucket);
+        when(bucket.get()).thenReturn(null);
+
+        assertThat(repository.findUsername("missing-token")).isEmpty();
+    }
+
+    @Test
     void deleteReturnsRedisDeletionResult() {
         when(redissonClient.<String>getBucket("test:auth:session:opaque-token")).thenReturn(bucket);
         when(bucket.delete()).thenReturn(true);

@@ -1,5 +1,6 @@
 package com.xiaou.web.auth;
 
+import com.xiaou.web.response.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,29 +26,29 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthApiResponse<AuthLoginResult>> login(
+    public ResponseEntity<ApiResponse<AuthLoginResult>> login(
             @Valid @RequestBody AuthLoginRequest request) {
         AuthLoginResult result = authService.login(request.username(), request.password());
-        return ResponseEntity.ok(AuthApiResponse.success("登录成功", result));
+        return ResponseEntity.ok(ApiResponse.success("登录成功", result));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<AuthApiResponse<AuthLogoutResult>> logout(
+    public ResponseEntity<ApiResponse<AuthLogoutResult>> logout(
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization) {
         AuthLogoutResult result = authService.logout(extractBearerToken(authorization));
-        return ResponseEntity.ok(AuthApiResponse.success("退出成功", result));
+        return ResponseEntity.ok(ApiResponse.success("退出成功", result));
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<AuthApiResponse<Void>> handleInvalidCredentials(InvalidCredentialsException exception) {
+    public ResponseEntity<ApiResponse<Void>> handleInvalidCredentials(InvalidCredentialsException exception) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(AuthApiResponse.failure(401, exception.getMessage()));
+                .body(ApiResponse.failure(401, exception.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<AuthApiResponse<Void>> handleValidationFailure(MethodArgumentNotValidException exception) {
+    public ResponseEntity<ApiResponse<Void>> handleValidationFailure(MethodArgumentNotValidException exception) {
         return ResponseEntity.badRequest()
-                .body(AuthApiResponse.failure(400, "请求参数错误"));
+                .body(ApiResponse.failure(400, "请求参数错误"));
     }
 
     private String extractBearerToken(String authorization) {

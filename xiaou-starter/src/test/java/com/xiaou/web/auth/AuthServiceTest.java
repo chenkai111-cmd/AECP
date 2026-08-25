@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -84,6 +85,11 @@ class AuthServiceTest {
         @Override
         public boolean exists(String token) {
             return values.containsKey(token);
+        }
+
+        @Override
+        public Optional<String> findUsername(String token) {
+            return Optional.ofNullable(values.get(token));
         }
 
         @Override

@@ -5,6 +5,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
+import java.util.Optional;
 
 @Repository
 public class RedisAuthSessionRepository implements AuthSessionRepository {
@@ -25,6 +26,11 @@ public class RedisAuthSessionRepository implements AuthSessionRepository {
     @Override
     public boolean exists(String token) {
         return bucket(token).isExists();
+    }
+
+    @Override
+    public Optional<String> findUsername(String token) {
+        return Optional.ofNullable(bucket(token).get());
     }
 
     @Override
