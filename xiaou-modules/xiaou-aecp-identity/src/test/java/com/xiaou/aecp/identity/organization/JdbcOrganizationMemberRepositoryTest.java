@@ -38,7 +38,10 @@ class JdbcOrganizationMemberRepositoryTest {
         dataSource.setURL("jdbc:h2:mem:" + UUID.randomUUID()
                 + ";MODE=MySQL;DB_CLOSE_DELAY=-1");
         dataSource.setUser("sa");
-        Flyway.configure().dataSource(dataSource).locations("classpath:db/migration").load().migrate();
+        Flyway.configure().dataSource(dataSource)
+                .locations("classpath:db/migration", "classpath:db/dev-migration")
+                .load()
+                .migrate();
         repository = new JdbcOrganizationMemberRepository(new NamedParameterJdbcTemplate(dataSource));
         jdbc = new JdbcTemplate(dataSource);
         transactions = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
@@ -146,6 +149,11 @@ class JdbcOrganizationMemberRepositoryTest {
 
         repository.insertMembership(COMAC, ENG_A, ORGANIZATION_ADMIN, FIRST);
         assertThat(repository.countActiveAdministrators(COMAC)).isEqualTo(2);
+
+        jdbc.update("UPDATE aecp_user_account SET enabled = FALSE WHERE id = ?", ENG_A);
+        assertThat(repository.countActiveAdministrators(COMAC)).isEqualTo(1);
+
+        jdbc.update("UPDATE aecp_user_account SET enabled = TRUE WHERE id = ?", ENG_A);
 
         repository.deactivateMembership(COMAC, ENG_A, SECOND);
         assertThat(repository.countActiveAdministrators(COMAC)).isEqualTo(1);

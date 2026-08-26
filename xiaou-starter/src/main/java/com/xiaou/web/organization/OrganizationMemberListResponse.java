@@ -4,5 +4,5 @@ import java.util.List;
 
 public record OrganizationMemberListResponse(
         List<OrganizationMemberResponse> items,
-        long total) {
+        int total) {
 }

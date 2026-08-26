@@ -55,10 +55,12 @@ public class JdbcOrganizationMemberRepository implements OrganizationMemberRepos
             ORDER BY m.joined_at ASC, m.user_id ASC
             """;
     private static final String ADMINISTRATOR_COUNT_SQL = """
-            SELECT COUNT(*) FROM aecp_organization_member
-            WHERE organization_id = :organizationId
-              AND active = TRUE
-              AND role = 'ORGANIZATION_ADMIN'
+            SELECT COUNT(*) FROM aecp_organization_member m
+            JOIN aecp_user_account u ON u.id = m.user_id
+            WHERE m.organization_id = :organizationId
+              AND m.active = TRUE
+              AND m.role = 'ORGANIZATION_ADMIN'
+              AND u.enabled = TRUE
             """;
     private static final String INSERT_MEMBERSHIP_SQL = """
             INSERT INTO aecp_organization_member
