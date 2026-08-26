@@ -40,6 +40,13 @@ public class OrganizationMemberService {
         return repository.findActiveMembers(organizationId);
     }
 
+    @Transactional(readOnly = true)
+    public List<OrganizationUserCandidate> searchMemberCandidates(
+            String actorUsername, String organizationId, String employeeNo) {
+        requireOrganization(organizationId);
+        requireAdministrator(actorUsername, organizationId);
+        return repository.findMemberCandidates(organizationId, employeeNo == null ? "" : employeeNo.trim());
+    }
     @Transactional
     public OrganizationMember addMember(
             String actorUsername, String organizationId, String userId, OrganizationRole role) {

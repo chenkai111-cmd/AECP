@@ -1,205 +1,223 @@
 [
   {
     "id": "F00",
-    "behavior": "GET / returns HTTP 200 and an HTML page containing '欢迎使用AECP' and '会议 → 任务 → 文件 → 部件追溯'",
-    "verification": ".\\mvnw.cmd clean test",
+    "epic": "平台基础与个人工作台",
+    "name": "平台入口、登录退出与个人工作台",
+    "priority": "P0",
+    "phase": "MVP",
+    "source_requirements": ["REQ-ROLE-001", "REQ-ROLE-002", "REQ-PERS-001", "个人工作台功能架构"],
+    "user_roles": ["所有用户"],
+    "frontend": {"pages": ["首页", "登录页", "工作台"], "features": ["账号密码登录", "会话过期重新登录", "退出后保护路由重定向", "代办/已办、我的项目、我的部件、近期动态卡片", "加载/空/错误状态"]},
+    "backend": {"apis": ["GET /", "POST /api/v1/auth/login", "POST /api/v1/auth/logout", "GET /api/v1/me/workbench"], "rules": ["密码bcrypt校验", "登录失败5次锁定30分钟", "会话即时失效", "聚合数据按当前用户项目权限过滤", "登录、登出和关键操作写审计"]},
+    "data": ["User", "Organization", "AuthSession", "Task", "ProjectMember", "Notification", "AuditLog"],
+    "permissions": ["未登录仅可访问公开首页和登录页", "工作台只展示当前用户有权数据"],
+    "acceptance_criteria": ["登录成功进入工作台", "错误凭据、锁定、会话失效有明确提示", "退出后再次访问保护路由回到登录页", "工作台可跳转代办、项目、部件和近期动态", "无数据和接口错误有可恢复状态"],
+    "verification": ["前端路由/工作台状态测试、typecheck、build", "后端认证和聚合接口测试", "真实HTTP登录/退出/失效冒烟"],
     "state": "passing",
-    "evidence": "docs/STARTUP_CHECKLIST.md；xiaou-starter/src/test/java/com/xiaou/web/controller/IndexControllerTest.java"
+    "evidence": "docs/STARTUP_CHECKLIST.md；xiaou-frontend/src/app；xiaou-starter/src/main/java/com/xiaou/web/auth"
   },
   {
     "id": "F01",
-    "behavior": "本地演示登录后可以访问 /workspace、/dashboard 等受保护路由，退出后再次访问会重定向到 /login",
-    "verification": "pnpm --dir xiaou-frontend test:routes",
+    "epic": "用户与职责管理",
+    "name": "双组织架构、角色权限、职责矩阵与项目成员",
+    "priority": "P0",
+    "phase": "MVP",
+    "source_requirements": ["REQ-ROLE-001", "REQ-ROLE-002", "REQ-ROLE-003", "REQ-ROLE-004", "REQ-ROLE-005"],
+    "user_roles": ["系统管理员", "组织管理员", "项目管理员", "项目经理", "部件负责人"],
+    "frontend": {"pages": ["组织架构", "角色权限", "项目成员", "职责矩阵", "部件负责人"], "features": ["商飞/商发组织树和人员批量导入", "系统级/项目级角色配置", "从双方组织搜索添加成员", "职责类型主责/配合/审批/验证/交付", "成员目录角色只读展示，不提供角色下拉或保存按钮", "最后管理员、重复成员、无负责人、401/403状态"]},
+    "backend": {"apis": ["组织/用户CRUD", "项目成员CRUD", "职责矩阵CRUD", "部件负责人CRUD"], "rules": ["双方组织独立", "成员必须来自双方组织", "最后一名管理员不可删除或降级", "成员移除软删除并保留历史", "职责矩阵和负责人驱动任务分发", "成员和权限变更写审计"]},
+    "data": ["Organization", "User", "ProjectMember", "Role", "Permission", "ResponsibilityMatrix", "ComponentOwner", "AuditLog"],
+    "permissions": ["系统管理员维护组织和系统角色", "项目管理员维护项目成员和职责", "普通成员只读授权范围", "项目之间严格隔离"],
+    "acceptance_criteria": ["可维护双方组织、部门和人员", "可添加、移除和分配项目角色", "可配置双方部件负责人和职责", "越权返回403", "成员目录只显示已保存角色，不允许直接修改"],
+    "verification": ["前端页面、角色只读和权限状态测试、typecheck、build", "后端领域/Repository/Controller测试", "真实HTTP成员CRUD、跨组织403、非管理员403"],
     "state": "passing",
-    "evidence": "xiaou-frontend/src/app/__tests__/shell-routes.test.tsx；xiaou-frontend/src/app/route-config.ts"
+    "evidence": "docs/STARTUP_CHECKLIST.md；xiaou-frontend/src/pages/OrganizationMembersPage.tsx；xiaou-modules/xiaou-aecp-identity"
   },
   {
     "id": "F02",
-    "behavior": "POST /api/v1/auth/login with {username, password} returns 200 and POST /api/v1/auth/logout invalidates the session",
-    "verification": "curl.exe -sS -X POST http://localhost:8080/api/v1/auth/login -H \"Content-Type: application/json\" -d \"{\\\"username\\\":\\\"demo-pilot-pm\\\",\\\"password\\\":\\\"$env:AECP_TEST_PASSWORD\\\"}\" | jq -e '.status == 200 and .data.token != null'",
+    "epic": "项目管理",
+    "name": "项目创建、配置、成员和进度管理",
+    "priority": "P0/P1",
+    "phase": "MVP+一期P1",
+    "source_requirements": ["REQ-PM-001", "REQ-PM-002", "REQ-PM-003", "REQ-PM-004"],
+    "user_roles": ["系统管理员", "项目管理员", "项目经理", "项目总监"],
+    "frontend": {"pages": ["项目列表", "项目创建/详情", "项目成员", "里程碑", "甘特图", "健康度看板"], "features": ["填写型号、代号、双方组织、安全级别和周期", "切换项目上下文", "里程碑计划/实际日期和状态", "进度、风险、健康度图表", "按组织、专业、部件筛选", "创建/加载/保存/无权/空状态"]},
+    "backend": {"apis": ["项目CRUD", "里程碑CRUD", "项目进度", "项目健康度"], "rules": ["所有根实体绑定project_id", "创建者自动成为项目管理员", "客户端不能覆盖服务端项目上下文", "风险包含延期里程碑、超期任务、高优先级CR和负责人空缺"]},
+    "data": ["Project", "ProjectMember", "Milestone", "Task", "ChangeRequest", "Component"],
+    "permissions": ["非项目成员不可读项目数据", "项目管理员维护成员和项目配置", "项目经理/总监查看进度和健康度"],
+    "acceptance_criteria": ["项目创建返回唯一ID并可重新打开", "成员和当前项目上下文在各模块一致", "里程碑和健康度指标计算正确", "越权读取返回403", "P1看板不阻塞MVP主链路"],
+    "verification": ["前端项目表单/看板测试、typecheck、build", "后端项目权限和指标测试", "真实HTTP创建项目、配置成员并读取详情"],
     "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-ROLE-001/002；验证未执行"
+    "evidence": "规划项；来源：PRD REQ-PM-001~004"
   },
   {
     "id": "F03",
-    "behavior": "管理员可以为组织新增、移除和变更成员角色，GET /api/v1/organizations/{organizationId}/members 返回当前成员列表",
-    "verification": "curl.exe -sS -X POST http://localhost:8080/api/v1/organizations/ORG-DEMO-COMAC/members -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" -H \"Content-Type: application/json\" -d \"{\\\"user_id\\\":\\\"USR-DEMO-ENG-A\\\",\\\"role\\\":\\\"ENGINEER\\\"}\" | jq -e '.status == 201'",
+    "epic": "系统部件管理",
+    "name": "系统部件树、属性、负责人、关联和变更",
+    "priority": "P0",
+    "phase": "MVP",
+    "source_requirements": ["REQ-COMP-001", "REQ-COMP-002", "REQ-COMP-003", "REQ-COMP-004", "REQ-COMP-005"],
+    "user_roles": ["项目管理员", "部件负责人", "工程师", "项目经理"],
+    "frontend": {"pages": ["部件树", "部件详情", "关联文件/数模", "部件变更"], "features": ["系统→子系统→部件→零件最多5级", "树搜索、展开、筛选", "属性/参数和技术状态", "商飞侧/商发侧负责人", "关联文件、数模、任务、会议和CR", "变更时间线、重复编码和导入失败提示"]},
+    "backend": {"apis": ["部件CRUD/批量导入", "负责人/职责CRUD", "部件关联查询", "GET /api/v1/components/{componentId}/timeline"], "rules": ["部件编号在项目内唯一", "批量导入校验父子关系和层级", "负责人变更和部件修改写审计", "关联对象必须属于同一项目"]},
+    "data": ["Component", "ComponentOwner", "ResponsibilityMatrix", "FileComponentRel", "FileCadRel", "Task", "AuditLog"],
+    "permissions": ["项目管理员维护部件", "负责人维护授权职责范围", "项目成员按项目权限查看"],
+    "acceptance_criteria": ["导入后树完整且层级正确", "详情展示属性、负责人、关联对象和时间线", "重复编码/非法父节点不能提交", "跨项目关联被拒绝", "负责人空缺可进入风险统计"],
+    "verification": ["树组件和导入交互测试", "层级/唯一性/项目隔离测试", "真实HTTP导入部件树并读取详情"],
     "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-ROLE-001/004；验证未执行"
+    "evidence": "规划项；来源：PRD REQ-COMP-001~005"
   },
   {
     "id": "F04",
-    "behavior": "项目管理员可以创建项目、绑定双方组织并选择项目成员，创建后 GET /api/v1/projects/{projectId} 返回项目配置",
-    "verification": "curl.exe -sS -X POST http://localhost:8080/api/v1/projects -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" -H \"Content-Type: application/json\" -d \"{\\\"name\\\":\\\"接口协同演示项目\\\",\\\"organization_ids\\\":[\\\"ORG-DEMO-COMAC\\\",\\\"ORG-DEMO-AECC\\\"]}\" | jq -e '.status == 201 and .data.id != null'",
+    "epic": "会议管理",
+    "name": "会议预约、议程、纪要、决议和历史追溯",
+    "priority": "P0",
+    "phase": "MVP",
+    "source_requirements": ["REQ-MEET-001", "REQ-MEET-002", "REQ-MEET-003", "REQ-MEET-005"],
+    "user_roles": ["会议主持人", "记录人", "项目经理", "项目成员"],
+    "frontend": {"pages": ["会议列表", "会议创建/详情", "议程", "纪要和决议", "会议历史"], "features": ["时间/地点/线上链接/类型/参会人", "议程主题、汇报人、时长和顺序调整", "纪要模板和自动保存草稿", "结构化决议内容、责任人、期限、优先级、关联部件", "按时间/类型/参会人查询并查看任务闭环", "草稿/发布/修订/空/错误状态"]},
+    "backend": {"apis": ["会议/参会人/议程CRUD", "纪要发布和修订", "决议CRUD", "历史查询"], "rules": ["发布后不可覆盖原纪要，修订递增", "决议必须有内容、责任人和期限", "会议资料可归档", "写操作幂等"]},
+    "data": ["Meeting", "MeetingAttendee", "MeetingAgenda", "MeetingMinutesRevision", "MeetingResolution"],
+    "permissions": ["主持人可编辑和发布", "记录人可维护纪要", "项目成员可查看授权项目会议"],
+    "acceptance_criteria": ["可创建会议、邀请参会人和维护有序议程", "可发布结构化纪要和决议", "发布后修改保留历史版本", "历史会议可查看纪要、决议和任务闭环状态", "越权返回403"],
+    "verification": ["会议页面和表单状态测试", "纪要版本和权限测试", "真实HTTP创建会议、发布纪要、查询历史"],
     "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-PM-001；验证未执行"
+    "evidence": "规划项；来源：PRD REQ-MEET-001~005"
   },
   {
     "id": "F05",
-    "behavior": "项目成员只能读取所属项目数据，用户 A 读取项目 B 的详情或文件时返回 403",
-    "verification": "curl.exe -sS -o $null -w '%{http_code}' http://localhost:8080/api/v1/projects/PRJ-DEMO-OTHER -H \"Authorization: Bearer $env:AECP_TEST_TOKEN_USER_A\" | jq -e '.[0] == 4 and .[1] == 0 and .[2] == 3'",
+    "epic": "任务管理",
+    "name": "会议/CR/里程碑任务自动分发、代办已办和跟踪",
+    "priority": "P0/P1",
+    "phase": "MVP+一期P1统计",
+    "source_requirements": ["REQ-MEET-004", "REQ-TASK-001", "REQ-TASK-002", "REQ-TASK-003", "REQ-TASK-004", "REQ-TASK-005"],
+    "user_roles": ["责任人", "协作人", "项目经理", "项目管理员"],
+    "frontend": {"pages": ["分发确认", "我的代办", "我的已办", "任务详情", "任务统计"], "features": ["决议分发前预览、调整责任人和批量确认", "代办/已办双视图", "按优先级、截止日期、项目、类型和状态筛选", "进度、状态、交付文件、协作人", "转派原因、手动催办、超期标识", "完成率/周期/超期率趋势和空状态"]},
+    "backend": {"apis": ["决议确认", "GET /api/v1/me/tasks/todo", "GET /api/v1/me/tasks/done", "PATCH /api/v1/tasks/{taskId}", "任务转派/催办", "任务统计"], "rules": ["按职责矩阵和部件负责人匹配责任人", "一条决议可生成多个任务", "idempotency_key防重复", "父任务进度按子任务权重汇总", "完成和转派校验权限", "催办限流并记录审计"]},
+    "data": ["Task", "ResolutionTask", "TaskDeliverable", "OutboxEvent", "Notification", "AuditLog"],
+    "permissions": ["责任人修改自己的任务", "项目经理转派和催办", "成员只能查看授权项目任务", "统计按项目权限聚合"],
+    "acceptance_criteria": ["决议确认幂等创建任务并通知责任人", "代办完成后进入已办且保留来源", "进度/状态/交付物可追溯", "转派必须填写原因", "重复催办受限流保护", "统计口径和筛选结果一致"],
+    "verification": ["前端任务状态/筛选测试", "后端状态机、幂等、并发、限流测试", "真实HTTP重复确认、更新任务、查看代办已办"],
     "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-ROLE-002；验证未执行"
+    "evidence": "规划项；来源：PRD REQ-MEET-004、REQ-TASK-001~005"
   },
   {
     "id": "F06",
-    "behavior": "管理员可以创建和导入系统→子系统→部件→零件层级，GET /api/v1/projects/{projectId}/components/tree 返回完整树结构",
-    "verification": "curl.exe -sS -X POST http://localhost:8080/api/v1/projects/PRJ-DEMO-CJ1000A/components/import -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" -F file=@docs/fixtures/components.csv | jq -e '.status == 201 and .data.imported_count > 0'",
+    "epic": "文件管理",
+    "name": "统一文件空间、上传版本、关联和安全下载",
+    "priority": "P0",
+    "phase": "MVP",
+    "source_requirements": ["REQ-FILE-001", "REQ-FILE-002", "REQ-FILE-003", "REQ-FILE-004"],
+    "user_roles": ["双方项目成员", "项目管理员", "部件负责人"],
+    "frontend": {"pages": ["项目文件空间", "上传面板", "版本历史", "关联确认", "下载"], "features": ["统一文件夹、搜索、分类/密级/组织侧筛选", "双方成员默认可见并可上传项目文件", "最大2GB分片、断点续传、秒传进度", "版本递增、变更说明、基线、回溯", "基于部件编号/文件名/元数据展示匹配置信度", "手动确认/修正关联", "下载权限、扫描中、过期和失败状态"]},
+    "backend": {"apis": ["文件夹/文件CRUD", "上传会话/分片/合并", "版本和基线", "文件-部件/数模关联", "下载URL"], "rules": ["项目内双方成员共享可见，组织侧仅筛选统计", "版本UNIQUE(file_id,version_no)并乐观锁", "三重匹配目标准确率≥90%", "下载链接≤2小时", "病毒扫描、禁止exe/bat/sh、AES-256存储、隐形水印", "所有上传/下载/关联写审计"]},
+    "data": ["File", "FileVersion", "FileUploadSession", "FileComponentRel", "FileCadRel", "AuditLog"],
+    "permissions": ["项目成员查看和上传", "基线/回溯/关联确认按角色", "项目外访问403", "下载单独进行角色校验"],
+    "acceptance_criteria": ["双方项目成员看到同一项目文件空间", "大文件可暂停恢复并生成正确版本", "重复文件可秒传", "自动关联给出置信度且可手动修正", "无权下载403，授权链接≤7200秒", "恶意文件拒绝且有原因"],
+    "verification": ["前端文件列表/上传/关联测试", "分片、版本、权限、病毒和下载时效测试", "真实HTTP上传、读取版本、关联和授权下载"],
     "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-COMP-001/002；验证未执行"
+    "evidence": "规划项；来源：PRD REQ-FILE-001~004、5.3"
   },
   {
     "id": "F07",
-    "behavior": "管理员可以为部件配置双方负责人和职责矩阵，保存后 GET /api/v1/components/{componentId}/responsibility 返回双方责任关系",
-    "verification": "curl.exe -sS -X PUT http://localhost:8080/api/v1/components/CMP-DEMO-IFACE/responsibility -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" -H \"Content-Type: application/json\" -d \"{\\\"primary_owner_id\\\":\\\"USR-DEMO-ENG-A\\\",\\\"secondary_owner_id\\\":\\\"USR-DEMO-ENG-B\\\"}\" | jq -e '.status == 200 and .data.primary_owner_id == \"USR-DEMO-ENG-A\"'",
+    "epic": "数模查看",
+    "name": "STEP在线查看、剖切测量、批注和版本对比",
+    "priority": "P0",
+    "phase": "MVP",
+    "source_requirements": ["REQ-CAD-001", "REQ-CAD-002", "REQ-CAD-003", "REQ-CAD-004", "REQ-CAD-005"],
+    "user_roles": ["项目成员", "工程师", "部件负责人", "项目经理"],
+    "frontend": {"pages": ["STEP数模查看器", "模型对比"], "features": ["WebAssembly解析.step/.stp并在WebGL中旋转/缩放/平移", "装配树和模型信息", "剖切面、距离/点测量", "圈点/文字/箭头批注和回复", "同一文件两个版本对比与差异高亮", "解析中/失败/模型过大/无版本/无权限状态，失败可下载原文件"]},
+    "backend": {"apis": ["文件版本详情", "viewer-manifest", "模型元数据", "批注CRUD/回复", "模型对比"], "rules": ["一期仅STEP，CATIA/IGES不支持", "浏览器端解析内存三角网格，不生成服务端glTF", "解析失败不阻塞原文件下载", "批注绑定FileVersion和坐标/镜头", "对比版本必须同项目且有共同权限", "查看/解析/批注事件埋点"]},
+    "data": ["FileVersion", "CadAnnotation", "ModelComparison", "FileCadRel", "CadViewEvent"],
+    "permissions": ["按文件版本查看权限控制", "批注需项目成员权限", "无权版本不得参与对比"],
+    "acceptance_criteria": ["有效STEP可在线查看并完成旋转、剖切和测量", "批注绑定具体版本且有权成员可见", "两个版本可对比并定位差异", "解析失败显示原因并可下载原文件", "不支持格式明确提示"],
+    "verification": ["前端查看器交互测试", "真实STEP样本浏览器冒烟", "解析失败、版本隔离、权限和大模型性能验证"],
     "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-ROLE-003/005、REQ-COMP-003；验证未执行"
+    "evidence": "规划项；来源：PRD REQ-CAD-001~005、AS-007、R-001/R-011"
   },
   {
     "id": "F08",
-    "behavior": "主持人可以创建会议、选择参会人并维护议程，GET /api/v1/meetings/{meetingId} 返回会议基本信息和有序议程",
-    "verification": "curl.exe -sS -X POST http://localhost:8080/api/v1/projects/PRJ-DEMO-CJ1000A/meetings -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" -H \"Content-Type: application/json\" -d \"{\\\"subject\\\":\\\"接口协调周例会\\\",\\\"attendee_ids\\\":[\\\"USR-DEMO-ENG-A\\\",\\\"USR-DEMO-ENG-B\\\"],\\\"agenda\\\":[{\\\"title\\\":\\\"安装节接口\\\",\\\"sort\\\":1}]}\" | jq -e '.status == 201 and .data.agenda[0].sort == 1'",
+    "epic": "追溯",
+    "name": "部件、文件、数模、会议、任务和变更全链路追溯",
+    "priority": "P0",
+    "phase": "MVP",
+    "source_requirements": ["REQ-COMP-005", "MVP-03"],
+    "user_roles": ["工程师", "部件负责人", "项目经理", "审计查看者"],
+    "frontend": {"pages": ["部件详情", "追溯时间线"], "features": ["按时间和对象类型筛选", "文件/版本、数模、会议决议、任务、CR和负责人变更节点", "点击节点跳转原始对象", "历史对象软删除后仍显示可追溯状态"]},
+    "backend": {"apis": ["GET /api/v1/components/{componentId}/timeline"], "rules": ["所有关联对象校验同一project_id", "业务数据永久保留且只允许软删除", "历史时间线稳定排序", "审计与业务历史不可由普通接口覆盖"]},
+    "data": ["Component", "FileVersion", "MeetingResolution", "Task", "ChangeRequest", "AuditLog"],
+    "permissions": ["项目成员查看项目追溯", "审计角色查看审计事件但不可修改"],
+    "acceptance_criteria": ["部件详情展示完整关联链", "时间线可筛选和跳转", "软删除不破坏历史关系", "跨项目关联和越权读取被拒绝"],
+    "verification": ["聚合查询、软删除、项目隔离测试", "前端时间线测试", "真实HTTP读取包含文件/任务/会议的追溯链"],
     "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-MEET-001/002；验证未执行"
+    "evidence": "规划项；来源：PRD MVP-03、6.2"
   },
   {
     "id": "F09",
-    "behavior": "主持人可以保存会议纪要和结构化决议，决议包含负责人、截止时间、优先级和关联部件并可重新查看",
-    "verification": "curl.exe -sS -X POST http://localhost:8080/api/v1/meetings/MTG-DEMO-001/minutes -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" -H \"Content-Type: application/json\" -d \"{\\\"summary\\\":\\\"已确认接口尺寸\\\",\\\"decisions\\\":[{\\\"content\\\":\\\"提交最新参数表\\\",\\\"assignee_id\\\":\\\"USR-DEMO-ENG-A\\\",\\\"component_id\\\":\\\"CMP-DEMO-IFACE\\\"}]}\" | jq -e '.status == 201 and .data.decisions | length == 1'",
+    "epic": "变更与沟通",
+    "name": "CR审批、影响分析、项目消息、话题和通知",
+    "priority": "P1",
+    "phase": "一期P1，不作为MVP门槛",
+    "source_requirements": ["REQ-CR-001", "REQ-CR-002", "REQ-CR-003", "REQ-COM-001", "REQ-COM-002", "REQ-COM-003"],
+    "user_roles": ["工程师", "双方接口工程师", "项目经理", "审批人", "项目成员"],
+    "frontend": {"pages": ["CR列表/详情", "审批", "影响分析", "项目消息", "话题", "通知中心"], "features": ["CR标题、原因、关联部件/文件/数模", "审批链、意见、状态和实施闭环", "影响对象和实施任务", "文字/文件/对象消息", "话题标签、引用、结论和状态筛选", "通知未读数、已读和对象跳转", "草稿/待审批/驳回/实施中/已闭环/发送失败状态"]},
+    "backend": {"apis": ["CR CRUD/审批/影响分析/闭环", "消息/话题/通知CRUD"], "rules": ["审批节点按双方接口工程师和项目经理职责匹配", "状态机不可跳跃", "影响分析对象同项目", "消息和通知按项目权限过滤", "重复事件不重复通知"]},
+    "data": ["ChangeRequest", "CRApprovalNode", "Message", "Conversation", "Notification", "Task"],
+    "permissions": ["符合职责的审批人可审批", "项目成员可访问项目沟通", "发起人可查看自己的CR", "项目外用户不可见"],
+    "acceptance_criteria": ["CR可提交、审批、驳回、实施和闭环", "审批意见和影响对象可追溯", "消息和话题支持附件/引用/结论", "通知未读数准确且可跳转", "P1不阻塞一期MVP发布"],
+    "verification": ["前端状态和消息交互测试", "CR状态机、审批权限、通知幂等测试", "前后端CR和消息流程联调"],
     "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-MEET-003；验证未执行"
+    "evidence": "规划项；来源：PRD标注P1"
   },
   {
     "id": "F10",
-    "behavior": "同一会议决议重复确认只创建一个任务并产生一条通知，重复请求返回同一个 idempotency_key 结果",
-    "verification": "$r1 = curl.exe -sS -X POST http://localhost:8080/api/v1/meetings/MTG-DEMO-001/decisions/DEC-DEMO-001/confirm -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\"; $r2 = curl.exe -sS -X POST http://localhost:8080/api/v1/meetings/MTG-DEMO-001/decisions/DEC-DEMO-001/confirm -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\"; jq -n --argjson a $r1 --argjson b $r2 -e '$a.data.task_id == $b.data.task_id and $b.data.created == false'",
+    "epic": "系统管理与历史导入",
+    "name": "审计日志、系统配置和EPICCA历史文件导入",
+    "priority": "P0/P1",
+    "phase": "MVP基础管理+一期P1导入",
+    "source_requirements": ["REQ-SYS-001", "REQ-SYS-002", "REQ-SYS-003"],
+    "user_roles": ["系统管理员", "项目管理员", "审计查看者"],
+    "frontend": {"pages": ["审计日志", "角色权限", "系统配置", "EPICCA导入", "导入结果"], "features": ["按用户/项目/动作/时间查询日志", "配置项目规则、存储限制和通知模板", "上传EPICCA历史Excel、Word/PDF", "异步进度、逐条成功/失败原因、错误报告和重试", "无权限、无结果、处理中、部分成功和失败状态"]},
+    "backend": {"apis": ["审计查询", "角色/系统配置CRUD", "POST /api/v1/projects/{projectId}/epicca/imports", "导入状态/结果/错误报告"], "rules": ["审计覆盖登录、文件、权限、任务、部件、CR和审批", "审计记录不可由业务接口修改，保留180天", "配置变更写审计", "一期EPICCA只做文件导入，异步逐条处理并幂等", "API凭证不进入一期数据库和接口路径"]},
+    "data": ["AuditLog", "Role", "Permission", "SystemConfig", "EPICCAImport", "ImportRecord", "FileVersion"],
+    "permissions": ["系统管理员修改系统配置", "项目管理员发起本项目导入", "审计查看者只读审计", "普通业务角色不能修改审计"],
+    "acceptance_criteria": ["审计日志可查询且不可业务修改", "配置按权限生效并可追溯", "EPICCA导入返回import_id并可查询逐条结果", "失败记录有原因且可重试不重复创建", "一期不实现EPICCA API实时同步"],
+    "verification": ["前端日志/导入状态测试", "后端审计不可篡改、权限、导入幂等测试", "真实HTTP查询审计并上传历史导入样本"],
     "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-MEET-004、REQ-TASK-001、REQ-COM-003；验证未执行"
+    "evidence": "规划项；来源：PRD REQ-SYS-001~003、一期MVP边界"
   },
   {
     "id": "F11",
-    "behavior": "责任人可以查看我的代办和已办、更新进度并将任务标记为完成，任务详情保留来源会议和关联部件",
-    "verification": "curl.exe -sS -X PATCH http://localhost:8080/api/v1/tasks/TSK-DEMO-001 -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" -H \"Content-Type: application/json\" -d \"{\\\"status\\\":\\\"COMPLETED\\\",\\\"progress\\\":100}\" | jq -e '.status == 200 and .data.status == \"COMPLETED\"'",
+    "epic": "EPICCA集成",
+    "name": "EPICCA API全量/增量双模式导入与实时同步",
+    "priority": "P2",
+    "phase": "二期",
+    "source_requirements": ["PRD V2.1 EPICCA API规划"],
+    "user_roles": ["系统管理员", "项目管理员"],
+    "frontend": {"pages": ["API连接配置", "字段映射", "同步监控"], "features": ["连接测试和凭证轮换", "全量/增量模式选择", "同步进度、冲突、失败原因、暂停/恢复和重试"]},
+    "backend": {"apis": ["连接配置", "全量导入", "增量同步", "同步状态/重试"], "rules": ["凭证加密存储", "API超时/限流/重试", "字段映射版本化", "同步幂等并记录冲突", "与一期文件导入路径隔离"]},
+    "data": ["EPICCAConnection", "EPICCASyncJob", "EPICCASyncRecord", "AuditLog"],
+    "permissions": ["仅系统管理员配置连接", "项目管理员发起项目同步", "凭证不可被普通用户读取"],
+    "acceptance_criteria": ["支持全量和增量两种模式", "单条失败、冲突和重试可追踪", "重复同步不重复创建数据", "API故障不影响一期文件导入", "不作为一期发布门槛"],
+    "verification": ["API契约、限流、超时、幂等测试", "同步监控页面测试", "使用EPICCA沙箱进行联调"],
     "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-TASK-002/003/004；验证未执行"
+    "evidence": "二期规划；PRD明确一期仅支持EPICCA历史文件导入"
   },
   {
     "id": "F12",
-    "behavior": "项目经理可以转派任务或手动催办，系统记录转派原因和催办记录且重复催办受限流保护",
-    "verification": "curl.exe -sS -X POST http://localhost:8080/api/v1/tasks/TSK-DEMO-001/reminders -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" | jq -e '.status == 202 and .data.reminder_id != null'",
+    "epic": "非功能与运营",
+    "name": "性能、安全、可用性、备份、埋点与指标",
+    "priority": "P0",
+    "phase": "MVP安全基线",
+    "source_requirements": ["PRD第五章", "PRD第六章", "PRD第七章灰度策略"],
+    "user_roles": ["系统管理员", "项目经理", "所有用户"],
+    "frontend": {"pages": ["全局错误/维护提示", "项目健康度和个人工作台指标"], "features": ["弱网加载和断点恢复", "表单30秒自动保存草稿", "服务降级提示", "会议/任务/文件/数模/部件/登录埋点", "指标按周期和项目展示"]},
+    "backend": {"apis": ["健康检查", "指标查询", "运维备份/恢复入口"], "rules": ["目标单项目约200人、总计400人、峰值100在线", "HTTPS/TLS1.2+、密码bcrypt、文件AES-256", "下载链接≤2小时", "服务可用性≥99.9%", "数据库每日全量+每小时增量，文件每日增量", "RPO≤1小时、RTO≤4小时", "文件存储不可用时项目/消息可降级，STEP失败仍可下载原文件"]},
+    "data": ["EventTracking", "AuditLog", "BackupRecord", "ServiceHealth"],
+    "permissions": ["指标按项目权限展示", "运维和备份能力不暴露给业务角色"],
+    "acceptance_criteria": ["核心性能和并发目标有压测证据", "RBAC、项目隔离、TLS、病毒扫描、下载时效和审计基线通过", "关键埋点可计算PRD成功指标", "备份恢复达到RPO/RTO", "灰度按可用性、错误率、解析失败率、关联准确率和活跃度监控"],
+    "verification": ["性能/并发压测", "安全基线和渗透测试", "故障降级与备份恢复演练", "埋点事件和指标口径校验"],
     "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-TASK-004；验证未执行"
-  },
-  {
-    "id": "F13",
-    "behavior": "项目成员可以上传项目文件并完成分片合并，首次上传生成版本 v1，后续上传同一文件生成递增版本并可查看版本历史",
-    "verification": "curl.exe -sS -X POST http://localhost:8080/api/v1/projects/PRJ-DEMO-CJ1000A/files/upload-complete -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" -F file=@docs/fixtures/demo-icd.xlsx -F change_note='initial upload' | jq -e '.status == 201 and .data.version == 1'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-FILE-001/002；验证未执行"
-  },
-  {
-    "id": "F14",
-    "behavior": "上传文件可以按部件编号和文件名自动关联部件/数模，用户可以在匹配失败时手动修正关联",
-    "verification": "curl.exe -sS -X POST http://localhost:8080/api/v1/files/FIL-DEMO-001/associations -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" -H \"Content-Type: application/json\" -d \"{\\\"component_id\\\":\\\"CMP-DEMO-IFACE\\\",\\\"association_type\\\":\\\"MANUAL\\\"}\" | jq -e '.status == 201 and .data.component_id == \"CMP-DEMO-IFACE\"'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-FILE-003、REQ-COMP-004；验证未执行"
-  },
-  {
-    "id": "F15",
-    "behavior": "项目成员可按权限访问项目文件，授权下载返回有效期不超过 2 小时的预签名 URL，越权下载返回 403",
-    "verification": "curl.exe -sS http://localhost:8080/api/v1/files/FIL-DEMO-001/download-url -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" | jq -e '.status == 200 and .data.expires_in_seconds <= 7200'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-FILE-004、REQ-ROLE-002；验证未执行"
-  },
-  {
-    "id": "F16",
-    "behavior": "部件详情页可以展示关联文件、数模、任务、会议决议和负责人变更形成的时间线",
-    "verification": "curl.exe -sS http://localhost:8080/api/v1/components/CMP-DEMO-IFACE/timeline -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" | jq -e '.status == 200 and (.data | length) > 0'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-COMP-005、MVP-03；验证未执行"
-  },
-  {
-    "id": "F17",
-    "behavior": "项目成员打开 STEP/STEP AP 文件后可以在浏览器中旋转、缩放、平移、剖切和测量，解析失败仍可下载原始文件",
-    "verification": "curl.exe -sS http://localhost:8080/api/v1/file-versions/FV-DEMO-STEP-001/viewer-manifest -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" | jq -e '.status == 200 and .data.format == \"STEP\"'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-CAD-001/002/005、MVP-04；验证未执行"
-  },
-  {
-    "id": "F18",
-    "behavior": "用户可以在 STEP 版本上创建批注并回复，批注绑定具体文件版本且对有权限的项目成员即时可见",
-    "verification": "curl.exe -sS -X POST http://localhost:8080/api/v1/file-versions/FV-DEMO-STEP-001/annotations -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" -H \"Content-Type: application/json\" -d \"{\\\"content\\\":\\\"检查安装面间隙\\\",\\\"position\\\":{\\\"x\\\":1,\\\"y\\\":2,\\\"z\\\":3}}\" | jq -e '.status == 201 and .data.file_version_id == \"FV-DEMO-STEP-001\"'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-CAD-003；验证未执行"
-  },
-  {
-    "id": "F19",
-    "behavior": "审计查看者可以按用户、项目、动作和时间查询登录、下载、授权和审批日志，业务角色不能修改审计记录",
-    "verification": "curl.exe -sS 'http://localhost:8080/api/v1/audit-logs?project_id=PRJ-DEMO-CJ1000A&action=FILE_DOWNLOAD' -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" | jq -e '.status == 200 and (.data.items | type) == \"array\"'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-SYS-001、MVP-05；验证未执行"
-  },
-  {
-    "id": "F20",
-    "behavior": "项目经理可以查看按项目、人员、部件和状态聚合的任务完成率、周期和超期率",
-    "verification": "curl.exe -sS 'http://localhost:8080/api/v1/projects/PRJ-DEMO-CJ1000A/task-stats?group_by=component' -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" | jq -e '.status == 200 and .data.completion_rate != null'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-TASK-005；P1，验证未执行"
-  },
-  {
-    "id": "F21",
-    "behavior": "项目经理可以创建里程碑并查看按组织、专业和部件筛选的项目进度与健康度指标",
-    "verification": "curl.exe -sS http://localhost:8080/api/v1/projects/PRJ-DEMO-CJ1000A/health -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" | jq -e '.status == 200 and .data.progress != null and .data.risk_count != null'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-PM-002/003/004；P1，验证未执行"
-  },
-  {
-    "id": "F22",
-    "behavior": "用户可以提交变更请求并按双方接口工程师、项目经理的审批链推进，变更状态和审批意见可追溯",
-    "verification": "curl.exe -sS -X POST http://localhost:8080/api/v1/projects/PRJ-DEMO-CJ1000A/change-requests -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" -H \"Content-Type: application/json\" -d \"{\\\"title\\\":\\\"安装面变更\\\",\\\"reason\\\":\\\"接口尺寸调整\\\"}\" | jq -e '.status == 201 and .data.status == \"PENDING_APPROVAL\"'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-CR-001/003；P1，验证未执行"
-  },
-  {
-    "id": "F23",
-    "behavior": "变更请求详情可以展示受影响的部件、文件、数模和任务，并在实施完成后支持闭环确认",
-    "verification": "curl.exe -sS http://localhost:8080/api/v1/change-requests/CR-DEMO-001/impact -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" | jq -e '.status == 200 and (.data.components | type) == \"array\" and (.data.files | type) == \"array\"'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-CR-002/003；P1，验证未执行"
-  },
-  {
-    "id": "F24",
-    "behavior": "项目成员可以在项目内发送文字、文件和对象消息，消息中心支持未读数、已读和通知列表",
-    "verification": "curl.exe -sS -X POST http://localhost:8080/api/v1/projects/PRJ-DEMO-CJ1000A/messages -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" -H \"Content-Type: application/json\" -d \"{\\\"content\\\":\\\"请查看最新接口文件\\\"}\" | jq -e '.status == 201 and .data.message_id != null'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-COM-001/003；P1，验证未执行"
-  },
-  {
-    "id": "F25",
-    "behavior": "项目成员可以创建带标签和附件的话题、引用消息并标记结论，话题支持按状态筛选",
-    "verification": "curl.exe -sS -X POST http://localhost:8080/api/v1/projects/PRJ-DEMO-CJ1000A/topics -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" -H \"Content-Type: application/json\" -d \"{\\\"title\\\":\\\"安装面讨论\\\",\\\"tags\\\":[\\\"接口\\\",\\\"安装节\\\"]}\" | jq -e '.status == 201 and .data.topic_id != null'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-COM-002；P1，验证未执行"
-  },
-  {
-    "id": "F26",
-    "behavior": "用户可以选择两个 STEP 文件版本进行几何差异对比，并在查看器中高亮差异区域",
-    "verification": "curl.exe -sS -X POST http://localhost:8080/api/v1/model-comparisons -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" -H \"Content-Type: application/json\" -d \"{\\\"base_version_id\\\":\\\"FV-DEMO-STEP-001\\\",\\\"target_version_id\\\":\\\"FV-DEMO-STEP-002\\\"}\" | jq -e '.status == 200 and .data.diff_count != null'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-CAD-004；P1，验证未执行"
-  },
-  {
-    "id": "F27",
-    "behavior": "项目管理员可以上传 EPICCA 历史 Excel 清单和 Word/PDF 文档，系统异步生成逐条导入结果并报告失败原因",
-    "verification": "curl.exe -sS -X POST http://localhost:8080/api/v1/projects/PRJ-DEMO-CJ1000A/epicca/imports -H \"Authorization: Bearer $env:AECP_TEST_TOKEN\" -F manifest=@docs/fixtures/epicca-manifest.xlsx -F documents=@docs/fixtures/epicca-reference.pdf | jq -e '.status == 202 and .data.import_id != null'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-SYS-003；P1，验证未执行"
-  },
-  {
-    "id": "F28",
-    "behavior": "系统管理员可以修改项目规则、存储限制和通知模板，配置变更产生审计记录并按权限生效",
-    "verification": "curl.exe -sS -X PUT http://localhost:8080/api/v1/admin/config/notification-templates -H \"Authorization: Bearer $env:AECP_TEST_TOKEN_ADMIN\" -H \"Content-Type: application/json\" -d \"{\\\"task_due\\\":\\\"任务即将到期：{title}\\\"}\" | jq -e '.status == 200 and .data.updated == true'",
-    "state": "planned",
-    "evidence": "规划项；来源：PRD_TRACEABILITY.md REQ-SYS-002；P1，验证未执行"
+    "evidence": "规划项；来源：PRD 5.1~5.4、6.3、6.4、7.2、8"
   }
 ]

@@ -1,6 +1,7 @@
 package com.xiaou.web.organization;
 
 import com.xiaou.aecp.identity.organization.OrganizationMember;
+import com.xiaou.aecp.identity.organization.OrganizationUserCandidate;
 import com.xiaou.aecp.identity.organization.OrganizationMemberService;
 import com.xiaou.web.auth.BearerSessionAuthenticator;
 import com.xiaou.web.response.ApiResponse;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -32,6 +34,20 @@ public class OrganizationMemberController {
             OrganizationMemberService service) {
         this.authenticator = authenticator;
         this.service = service;
+    }
+
+    @GetMapping("/candidates")
+    public ApiResponse<List<OrganizationUserCandidateResponse>> searchCandidates(
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
+            @PathVariable("organizationId") String organizationId,
+            @RequestParam(value = "employee_no", defaultValue = "") String employeeNo) {
+        String actor = authenticator.requireUsername(authorization);
+        List<OrganizationUserCandidateResponse> items = service
+                .searchMemberCandidates(actor, organizationId, employeeNo)
+                .stream()
+                .map(OrganizationUserCandidateResponse::from)
+                .toList();
+        return ApiResponse.success("查询成功", items);
     }
 
     @PostMapping

@@ -21,6 +21,12 @@ export const protectedRouteEntries: ProtectedRouteEntry[] = [
     description: '当前页面只提供壳体、布局与状态组件占位；真实数据与交互行为由后续任务接管。'
   },
   {
+    path: '/organization/members',
+    navLabel: '组织成员',
+    title: '组织成员管理',
+    description: '管理组织成员、角色和访问边界，数据通过 F03 后端 API 实时读取。'
+  },
+  {
     path: '/meetings',
     navLabel: '会议协同',
     title: '会议协同占位页',

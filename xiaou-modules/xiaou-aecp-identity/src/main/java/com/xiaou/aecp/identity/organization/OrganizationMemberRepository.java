@@ -20,6 +20,8 @@ public interface OrganizationMemberRepository {
 
     List<OrganizationMember> findActiveMembers(String organizationId);
 
+    List<OrganizationUserCandidate> findMemberCandidates(String organizationId, String employeeNo);
+
     long countActiveAdministrators(String organizationId);
 
     void insertMembership(String organizationId, String userId, OrganizationRole role, Instant now);

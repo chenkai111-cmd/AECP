@@ -8,6 +8,7 @@ import {
 } from './route-config'
 import { DashboardPage } from '../pages/DashboardPage'
 import { LoginPage } from '../pages/LoginPage'
+import { OrganizationMembersPage } from '../pages/OrganizationMembersPage'
 import { WorkspacePage } from '../pages/WorkspacePage'
 
 export const DEMO_SESSION_STORAGE_KEY = 'aecp-demo-session'
@@ -38,7 +39,7 @@ function ProductHomePage() {
           </p>
           <div className="hero-actions">
             <Link className="primary-action" to="/login">
-              进入前端演示壳
+              进入平台
             </Link>
             <a className="secondary-action" href="#flow">
               查看协作主链路
@@ -137,9 +138,9 @@ function AppShell() {
     <div className="app-shell">
       <aside className="shell-sidebar">
         <div>
-          <p className="shell-mark">AECP FRONTEND SHELL</p>
-          <h1>一期路由骨架</h1>
-          <p className="shell-summary">公开首页与登录页保持开放，业务路由统一通过一个本地 demo-session guard 受控。</p>
+          <p className="shell-mark">AECP 协作平台</p>
+          <h1>协同工作台</h1>
+          <p className="shell-summary">统一管理组织、项目与研发协作流程。</p>
         </div>
         <nav aria-label="AECP 主导航" className="shell-nav">
           {protectedRouteEntries.map((route) => {
@@ -165,17 +166,20 @@ function AppShell() {
           }}
           type="button"
         >
-          退出本地演示会话
+          退出登录
         </button>
       </aside>
 
       <div className="shell-main">
-        <header className="shell-header">
+                <header className="shell-header">
           <div>
             <p className="section-kicker">当前模块</p>
             <h2>{activeLabel}</h2>
           </div>
-          <p className="shell-header-note">PC 优先排版，窄屏下自动折叠为单列布局。</p>
+          <div className="shell-header-context">
+            <span>当前组织</span>
+            <strong>ORG-DEMO-COMAC</strong>
+          </div>
         </header>
         <Outlet />
       </div>
@@ -209,7 +213,6 @@ function LoginRoutePage() {
         setDemoSessionActive()
         navigate(redirectTo, { replace: true })
       }}
-      redirectTo={redirectTo}
     />
   )
 }
@@ -222,8 +225,14 @@ export function AppRoutes() {
       <Route element={<RequireDemoSession />}>
         <Route element={<WorkspacePage />} path="/workspace" />
         <Route element={<DashboardPage />} path="/dashboard" />
+        <Route element={<OrganizationMembersPage />} path="/organization/members" />
         {protectedRouteEntries
-          .filter((route) => route.path !== '/workspace' && route.path !== '/dashboard')
+          .filter(
+            (route) =>
+              route.path !== '/workspace' &&
+              route.path !== '/dashboard' &&
+              route.path !== '/organization/members'
+          )
           .map((route) => (
             <Route
               element={<PlaceholderPage description={route.description} title={route.title} />}

@@ -54,6 +54,18 @@ public class JdbcOrganizationMemberRepository implements OrganizationMemberRepos
               AND u.enabled = TRUE
             ORDER BY m.joined_at ASC, m.user_id ASC
             """;
+    private static final String MEMBER_CANDIDATES_SQL = """
+            SELECT u.id, u.username, u.display_name, m.user_id IS NOT NULL AS already_member
+            FROM aecp_user_account u
+            LEFT JOIN aecp_organization_member m
+              ON m.organization_id = :organizationId
+             AND m.user_id = u.id
+             AND m.active = TRUE
+            WHERE u.enabled = TRUE
+              AND u.username LIKE :employeeNo
+            ORDER BY u.username ASC
+            LIMIT 20
+            """;
     private static final String ADMINISTRATOR_COUNT_SQL = """
             SELECT COUNT(*) FROM aecp_organization_member m
             JOIN aecp_user_account u ON u.id = m.user_id
@@ -88,6 +100,12 @@ public class JdbcOrganizationMemberRepository implements OrganizationMemberRepos
             resultSet.getString("id"),
             resultSet.getString("username"),
             resultSet.getString("display_name"));
+    private static final RowMapper<OrganizationUserCandidate> CANDIDATE_MAPPER = (resultSet, rowNumber) ->
+            new OrganizationUserCandidate(
+                    resultSet.getString("id"),
+                    resultSet.getString("username"),
+                    resultSet.getString("display_name"),
+                    resultSet.getBoolean("already_member"));
     private static final RowMapper<OrganizationMembership> MEMBERSHIP_MAPPER = (resultSet, rowNumber) ->
             new OrganizationMembership(
                     resultSet.getString("organization_id"),
@@ -145,6 +163,15 @@ public class JdbcOrganizationMemberRepository implements OrganizationMemberRepos
     @Override
     public List<OrganizationMember> findActiveMembers(String organizationId) {
         return jdbc.query(ACTIVE_MEMBERS_SQL, organizationParameters(organizationId), MEMBER_MAPPER);
+    }
+
+    @Override
+    public List<OrganizationUserCandidate> findMemberCandidates(String organizationId, String employeeNo) {
+        return jdbc.query(MEMBER_CANDIDATES_SQL,
+                new MapSqlParameterSource()
+                        .addValue("organizationId", organizationId)
+                        .addValue("employeeNo", "%" + employeeNo + "%"),
+                CANDIDATE_MAPPER);
     }
 
     @Override

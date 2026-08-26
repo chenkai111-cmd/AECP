@@ -334,6 +334,14 @@ class OrganizationMemberServiceTest {
         }
 
         @Override
+        public List<OrganizationUserCandidate> findMemberCandidates(String organizationId, String employeeNo) {
+            return accountsById.values().stream()
+                    .filter(account -> account.username().contains(employeeNo))
+                    .map(account -> new OrganizationUserCandidate(account.id(), account.username(), account.displayName(), findActiveMember(organizationId, account.id()).isPresent()))
+                    .toList();
+        }
+
+        @Override
         public long countActiveAdministrators(String organizationId) {
             return memberships.values().stream()
                     .filter(membership -> membership.organizationId().equals(organizationId))

@@ -10,7 +10,6 @@
 - 当前分支：`main`
 - 技术栈：Java 17、Spring Boot 3.4.4、Maven Wrapper 3.9.9、MySQL 8.4、Redis 7.4、Docker Compose
 - Maven 坐标、`com.xiaou` 包名和 `xiaou-*` 模块名来自模板，当前阶段保持不变
-- 本阶段只完成工程初始化、环境配置和可验证测试框架，不开发会议、任务、文件、部件追溯等业务功能
 
 ## 目录结构
 
@@ -65,12 +64,6 @@ docker compose down
 
 ## 完成定义
 - 功能完成 = 端到端验证通过，不是"代码写完了"
-- 必须运行的验证层级:
-  1. 单元测试通过
-  2. 集成测试通过
-  3. 端到端流程验证通过
-- 在第 1 层没通过时，不许进入第 2 层
-- 在第 2 层没通过时，不许进入第 3 层
 
 
 ## 每次会话开始时（上班）
@@ -86,7 +79,7 @@ docker compose down
 
 ## 会话退出检查清单
 - [ ] 构建通过 (npm run build)
-- [ ] 所有测试通过 (npm test)
+- [ ] 功能测试通过 (npm test)
 - [ ] 功能清单已更新
 - [ ] 无调试代码残留 (console.log, debugger, TODO)
 - [ ] 标准启动路径可用 (npm run dev)

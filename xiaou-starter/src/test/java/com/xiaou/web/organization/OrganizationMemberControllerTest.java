@@ -4,6 +4,7 @@ import com.xiaou.aecp.identity.organization.OrganizationMember;
 import com.xiaou.aecp.identity.organization.OrganizationMemberError;
 import com.xiaou.aecp.identity.organization.OrganizationMemberService;
 import com.xiaou.aecp.identity.organization.OrganizationRole;
+import com.xiaou.aecp.identity.organization.OrganizationUserCandidate;
 import com.xiaou.web.auth.BearerSessionAuthenticator;
 import com.xiaou.web.auth.InvalidSessionException;
 import org.junit.jupiter.api.Test;
@@ -60,6 +61,22 @@ class OrganizationMemberControllerTest {
 
     @MockBean
     private BearerSessionAuthenticator authenticator;
+
+    @Test
+    void searchReturnsCandidatesByEmployeeNo() throws Exception {
+        authorize();
+        when(service.searchMemberCandidates(ACTOR, ORGANIZATION, "A-1001"))
+                .thenReturn(List.of(new OrganizationUserCandidate("USR-DEMO-EMP-1001", "A-1001", "张工", true)));
+
+        mockMvc.perform(get(COLLECTION + "/candidates")
+                        .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION)
+                        .param("employee_no", "A-1001"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data[0].user_id").value("USR-DEMO-EMP-1001"))
+                .andExpect(jsonPath("$.data[0].employee_no").value("A-1001"))
+                .andExpect(jsonPath("$.data[0].display_name").value("张工"))
+                .andExpect(jsonPath("$.data[0].already_member").value(true));
+    }
 
     @Test
     void addReturnsHttpAndBodyStatus201WithSnakeCaseMember() throws Exception {
